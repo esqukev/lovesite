@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import confetti from "canvas-confetti";
 import { Button } from "@/components/ui/button";
 import { useExperience } from "./ExperienceProvider";
+import { FrostHeart } from "./FrostHeart";
 
 export function Invitation({ active }: { active: boolean }) {
   const {
@@ -15,7 +16,7 @@ export function Invitation({ active }: { active: boolean }) {
   } = useExperience();
   const [noAttempts, setNoAttempts] = useState(0);
   const [noPos, setNoPos] = useState({ x: 0, y: 0 });
-  const [showThanks, setShowThanks] = useState(false);
+  const [showFrost, setShowFrost] = useState(false);
   const noRef = useRef<HTMLButtonElement>(null);
   const triggered = useRef(false);
 
@@ -48,14 +49,14 @@ export function Invitation({ active }: { active: boolean }) {
   const accept = () => {
     setInviteAccepted(true);
     setInviteOpen(false);
-    setShowThanks(true);
+    setShowFrost(true);
     confetti({
-      particleCount: 160,
-      spread: 80,
-      origin: { y: 0.55 },
-      colors: ["#e8b4b8", "#c4a574", "#f3ebe3"],
+      particleCount: 90,
+      spread: 70,
+      origin: { y: 0.5 },
+      colors: ["#e8b4b8", "#f3ebe3", "#ffffff", "#c4a574"],
+      scalar: 0.85,
     });
-    window.setTimeout(() => setShowThanks(false), 6000);
   };
 
   const dodge = () => {
@@ -133,23 +134,13 @@ export function Invitation({ active }: { active: boolean }) {
         )}
       </AnimatePresence>
 
-      <AnimatePresence>
-        {showThanks && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 12 }}
-            className="fixed bottom-6 left-1/2 z-[70] w-[min(92vw,420px)] -translate-x-1/2 rounded-2xl border border-white/15 bg-black/70 px-5 py-4 text-center backdrop-blur-xl"
-          >
-            <p className="font-display text-lg text-[var(--cream)]">
-              El tiempo contigo nunca es perdido.
-            </p>
-            <p className="mt-1 text-sm text-white/60">
-              Siempre será recordado y guardado en el alma.
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {showFrost && (
+        <FrostHeart
+          message="El tiempo contigo nunca es perdido."
+          submessage="Siempre será recordado y guardado en el alma."
+          onDone={() => setShowFrost(false)}
+        />
+      )}
     </>
   );
 }

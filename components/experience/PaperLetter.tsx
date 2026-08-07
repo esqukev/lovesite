@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { WELCOME_LETTER } from "@/lib/data";
-import { Button } from "@/components/ui/button";
 
 export function PaperLetter({ onStart }: { onStart: () => void }) {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -112,13 +111,28 @@ export function PaperLetter({ onStart }: { onStart: () => void }) {
             </p>
 
             <div
-              className={`mt-8 flex justify-center transition-all duration-700 ${
+              className={`mt-9 flex justify-center transition-all duration-700 ${
                 done ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-3 opacity-0"
               }`}
             >
-              <Button size="lg" onClick={start}>
-                Comenzar nuestro recorrido
-              </Button>
+              <button
+                type="button"
+                onClick={start}
+                className="letter-seal-btn group relative touch-manipulation"
+              >
+                <span className="letter-seal-glow" aria-hidden />
+                <span className="relative z-[1] flex flex-col items-center px-8 py-4">
+                  <span className="font-display text-lg tracking-wide text-[#f7efe6] sm:text-xl">
+                    Comenzar nuestro recorrido
+                  </span>
+                  <span className="mt-1 text-[10px] uppercase tracking-[0.28em] text-[#f7efe6]/65">
+                    Abre el universo
+                  </span>
+                </span>
+                <span className="letter-seal-heart" aria-hidden>
+                  ♥
+                </span>
+              </button>
             </div>
           </div>
         </div>
