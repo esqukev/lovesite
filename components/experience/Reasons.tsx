@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useRef, useState } from "react";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
@@ -91,18 +92,43 @@ export function Reasons() {
   const colors = HEART_COLORS[colorIndex];
 
   return (
-    <section ref={rootRef} id="razones" className="relative px-6 py-28">
+    <section
+      ref={rootRef}
+      id="razones"
+      className="section-soft relative px-6 py-20 sm:py-24"
+    >
+      <div
+        className="pointer-events-none absolute left-[6%] top-[18%] hidden w-16 rotate-[-10deg] sm:block"
+        aria-hidden
+      >
+        <div className="overflow-hidden rounded-md bg-white p-1 shadow-[0_12px_28px_rgba(42,28,34,0.16)]">
+          <div className="relative aspect-square w-full overflow-hidden rounded-sm">
+            <Image src="/foto4.jpeg" alt="" fill className="object-cover" sizes="80px" />
+          </div>
+        </div>
+      </div>
+      <div
+        className="pointer-events-none absolute bottom-[16%] right-[7%] hidden w-[4.5rem] rotate-[8deg] sm:block"
+        aria-hidden
+      >
+        <div className="overflow-hidden rounded-md bg-white p-1 shadow-[0_12px_28px_rgba(42,28,34,0.16)]">
+          <div className="relative aspect-square w-full overflow-hidden rounded-sm">
+            <Image src="/foto13.jpeg" alt="" fill className="object-cover" sizes="80px" />
+          </div>
+        </div>
+      </div>
+
       <div className="mx-auto max-w-3xl text-center">
         <p className="mb-3 text-xs uppercase tracking-[0.35em] text-[var(--gold)]">
           Dale click
         </p>
         <h2
           data-cinema="title"
-          className="font-display text-4xl text-[var(--cream)] sm:text-5xl"
+          className="font-display text-4xl text-[var(--ink)] sm:text-5xl"
         >
           Cosas que amo de ti
         </h2>
-        <p className="mx-auto mt-4 max-w-md text-white/50">
+        <p className="muted mx-auto mt-4 max-w-md">
           El corazón cambia con cada toque. Hay una razón distinta cada vez.
         </p>
 
@@ -171,11 +197,11 @@ export function Reasons() {
 
           <span
             ref={hintRef}
-            className="mt-6 flex items-center gap-2 text-[11px] uppercase tracking-[0.32em] text-[var(--cream)]/55"
+            className="mt-6 flex items-center gap-2 text-[11px] uppercase tracking-[0.32em] text-[var(--ink)]/50"
           >
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
             Toca para otra razón
-            <span className="tabular-nums text-white/35">
+            <span className="tabular-nums text-[var(--ink)]/35">
               {Math.min(revealed + 1, REASONS.length)}/{REASONS.length}
             </span>
           </span>

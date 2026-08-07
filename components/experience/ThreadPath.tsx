@@ -56,14 +56,14 @@ export function ThreadPath() {
         <path
           className="thread-soft"
           d="M48 40 C70 180, 25 320, 55 480 S20 700, 60 880 S30 1100, 52 1280 S75 1500, 40 1680 S65 1900, 50 2100"
-          stroke="rgba(232,180,184,0.22)"
+          stroke="rgba(200,107,120,0.18)"
           strokeWidth="2.5"
           strokeLinecap="round"
         />
         <path
           className="thread-main"
           d="M48 40 C70 180, 25 320, 55 480 S20 700, 60 880 S30 1100, 52 1280 S75 1500, 40 1680 S65 1900, 50 2100"
-          stroke="#e8b4b8"
+          stroke="#c86b78"
           strokeWidth="1.6"
           strokeLinecap="round"
         />

@@ -14,8 +14,18 @@ gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 type Item = { id: string; label: string; custom?: boolean };
 
-const CHECKED_KEY = "motzy-wishlist-checked";
-const CUSTOM_KEY = "motzy-wishlist-custom";
+const CHECKED_KEY = "motzy-wishlist-checked-v2";
+const CUSTOM_KEY = "motzy-wishlist-custom-v2";
+
+function readStorage<T>(key: string, fallback: T): T {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return fallback;
+    return JSON.parse(raw) as T;
+  } catch {
+    return fallback;
+  }
+}
 
 export function Wishlist() {
   const rootRef = useRef<HTMLElement>(null);
@@ -27,14 +37,19 @@ export function Wishlist() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    try {
-      const checkedRaw = localStorage.getItem(CHECKED_KEY);
-      const customRaw = localStorage.getItem(CUSTOM_KEY);
-      if (checkedRaw) setChecked(JSON.parse(checkedRaw) as Record<string, boolean>);
-      if (customRaw) setCustom(JSON.parse(customRaw) as Item[]);
-    } catch {
-      /* ignore */
+    const loadedChecked = readStorage<Record<string, boolean>>(CHECKED_KEY, {});
+    const loadedCustom = readStorage<Item[]>(CUSTOM_KEY, []);
+    // migrate from old keys if present
+    if (!localStorage.getItem(CHECKED_KEY)) {
+      const old = readStorage<Record<string, boolean>>("motzy-wishlist-checked", {});
+      Object.assign(loadedChecked, old);
     }
+    if (!localStorage.getItem(CUSTOM_KEY)) {
+      const old = readStorage<Item[]>("motzy-wishlist-custom", []);
+      loadedCustom.push(...old);
+    }
+    setChecked(loadedChecked);
+    setCustom(loadedCustom);
     setReady(true);
   }, []);
 
@@ -58,15 +73,16 @@ export function Wishlist() {
 
   useGSAP(
     () => {
+      if (!ready) return;
       gsap.from(".wish-row", {
         opacity: 0,
-        y: 28,
-        stagger: 0.08,
-        duration: 0.7,
+        y: 22,
+        stagger: 0.06,
+        duration: 0.65,
         ease: "power3.out",
         scrollTrigger: {
           trigger: rootRef.current,
-          start: "top 70%",
+          start: "top 72%",
         },
       });
     },
@@ -74,22 +90,22 @@ export function Wishlist() {
   );
 
   useEffect(() => {
-    if (allDone && !celebrated && items.length > 0) {
+    if (allDone && !celebrated && items.length > 0 && ready) {
       setCelebrated(true);
       confetti({
         particleCount: 140,
         spread: 76,
         origin: { y: 0.65 },
-        colors: ["#e8b4b8", "#c4a574", "#f3ebe3", "#ffffff"],
+        colors: ["#c86b78", "#9d6b45", "#fff7f5", "#2a1c22"],
       });
       pushToast("Lista completa", "Todo lo que queríamos… y aún falta más");
     }
-  }, [allDone, celebrated, items.length, pushToast]);
+  }, [allDone, celebrated, items.length, pushToast, ready]);
 
   const toggle = (id: string) => {
     setChecked((prev) => {
       const next = { ...prev, [id]: !prev[id] };
-      if (!prev[id]) pushToast("Hecho", "Una más juntos");
+      if (!prev[id]) pushToast("Hecho", "Guardado aquí");
       return next;
     });
   };
@@ -105,7 +121,7 @@ export function Wishlist() {
     };
     setCustom((prev) => [...prev, item]);
     setDraft("");
-    pushToast("Añadido", label);
+    pushToast("Añadido y guardado", label);
   };
 
   const removeCustom = (id: string) => {
@@ -118,33 +134,34 @@ export function Wishlist() {
   };
 
   return (
-    <section ref={rootRef} id="cosas-por-hacer" className="relative px-6 py-28">
+    <section
+      ref={rootRef}
+      id="cosas-por-hacer"
+      className="section-soft relative px-5 py-20 sm:px-8 sm:py-24"
+    >
       <div className="mx-auto max-w-2xl">
-        <div className="mb-12 text-center">
+        <div className="mb-10 text-center">
           <p className="mb-3 text-xs uppercase tracking-[0.35em] text-[var(--gold)]">
             Cosas por hacer
           </p>
-          <h2
-            data-cinema="title"
-            className="font-display text-4xl text-[var(--cream)] sm:text-5xl"
-          >
+          <h2 className="font-display text-4xl text-[var(--ink)] sm:text-5xl">
             Lo que todavía nos falta
           </h2>
-          <p className="mx-auto mt-4 max-w-md text-white/50">
-            Márcalo cuando lo vivamos. Tú también puedes escribir lo tuyo —
-            se guarda aquí.
+          <p className="muted mx-auto mt-4 max-w-md">
+            Márcalo cuando lo vivamos. Lo que añadas o marques se guarda en este
+            dispositivo y sigue ahí la próxima vez.
           </p>
-          <p className="mt-5 font-display text-lg italic text-[var(--accent)]/80">
-            {doneCount} de {items.length}
+          <p className="mt-5 font-display text-lg italic text-[var(--accent)]">
+            {ready ? `${doneCount} de ${items.length}` : "…"}
           </p>
         </div>
 
         <form
           onSubmit={addItem}
-          className="wish-row mb-8 flex flex-col gap-3 border-b border-white/10 pb-8 sm:flex-row sm:items-end"
+          className="wish-row mb-8 flex flex-col gap-3 border-b border-[var(--line)] pb-8 sm:flex-row sm:items-end"
         >
           <label className="flex-1">
-            <span className="mb-2 block text-[10px] uppercase tracking-[0.28em] text-white/35">
+            <span className="mb-2 block text-[10px] uppercase tracking-[0.28em] text-[var(--ink)]/40">
               Añadir algo
             </span>
             <input
@@ -152,13 +169,13 @@ export function Wishlist() {
               onChange={(e) => setDraft(e.target.value)}
               placeholder="Ej. Ver el atardecer en…"
               maxLength={80}
-              className="h-12 w-full border-0 border-b border-white/20 bg-transparent px-0 text-[var(--cream)] outline-none placeholder:text-white/25 focus:border-[var(--accent)]"
+              className="h-12 w-full border-0 border-b border-[var(--ink)]/20 bg-transparent px-0 text-[var(--ink)] outline-none placeholder:text-[var(--ink)]/30 focus:border-[var(--accent)]"
             />
           </label>
           <button
             type="submit"
             data-cursor="hover"
-            className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-white/15 px-5 text-sm text-[var(--cream)] transition hover:border-[var(--accent)]/50 hover:bg-white/5"
+            className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[var(--ink)] px-5 text-sm text-[var(--cream)] transition hover:bg-[var(--accent)]"
           >
             <Plus size={16} />
             Añadir
@@ -175,28 +192,28 @@ export function Wishlist() {
                   data-cursor="hover"
                   onClick={() => toggle(item.id)}
                   className={cn(
-                    "group flex min-h-[56px] flex-1 items-center gap-4 px-1 py-3.5 text-left transition-colors",
-                    on && "opacity-55",
+                    "group flex min-h-[56px] flex-1 items-center gap-4 px-1 py-3.5 text-left",
+                    on && "opacity-50",
                   )}
                 >
                   <span
                     className={cn(
-                      "flex h-7 w-7 shrink-0 items-center justify-center rounded-full border transition-all",
+                      "flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 transition-all",
                       on
-                        ? "border-[var(--accent)] bg-[var(--accent)] text-[var(--ink)]"
-                        : "border-white/25 text-transparent group-hover:border-[var(--accent)]/60",
+                        ? "border-[var(--accent)] bg-[var(--accent)] text-white"
+                        : "border-[var(--ink)]/25 text-transparent group-hover:border-[var(--accent)]",
                     )}
                   >
-                    <Check size={13} />
+                    <Check size={13} strokeWidth={3} />
                   </span>
                   <span className="flex min-w-0 flex-1 items-baseline gap-3">
-                    <span className="hidden text-[10px] tabular-nums text-white/25 sm:inline">
+                    <span className="hidden text-[10px] tabular-nums text-[var(--ink)]/30 sm:inline">
                       {String(i + 1).padStart(2, "0")}
                     </span>
                     <span
                       className={cn(
-                        "font-display text-xl leading-snug sm:text-2xl",
-                        on && "line-through decoration-white/30",
+                        "font-display text-xl leading-snug text-[var(--ink)] sm:text-2xl",
+                        on && "line-through decoration-[var(--ink)]/30",
                       )}
                     >
                       {item.label}
@@ -213,7 +230,7 @@ export function Wishlist() {
                     type="button"
                     aria-label="Eliminar"
                     onClick={() => removeCustom(item.id)}
-                    className="flex w-10 items-center justify-center text-white/30 transition hover:text-[var(--accent)]"
+                    className="flex w-10 items-center justify-center text-[var(--ink)]/30 transition hover:text-[var(--accent)]"
                   >
                     <Trash2 size={15} />
                   </button>

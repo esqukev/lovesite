@@ -69,24 +69,20 @@ export function StackedMemories() {
     <section
       ref={rootRef}
       id="recuerdos"
-      className="relative flex min-h-[100svh] items-center overflow-hidden px-5 py-24 sm:px-10"
+      className="section-soft relative flex min-h-[100svh] items-center overflow-hidden px-5 py-16 sm:px-10"
     >
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute left-1/2 top-1/2 h-[70vmax] w-[70vmax] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(232,180,184,0.08),transparent_62%)]" />
-      </div>
-
       <div className="relative z-10 mx-auto grid w-full max-w-5xl gap-10 lg:grid-cols-[auto_1fr_auto] lg:items-center lg:gap-16">
         <div className="hidden flex-col items-center gap-4 lg:flex">
-          <span className="memory-index font-display text-5xl tabular-nums text-[var(--cream)]/90">
+          <span className="memory-index font-display text-5xl tabular-nums text-[var(--ink)]">
             01
           </span>
-          <div className="relative h-40 w-px overflow-hidden bg-white/10">
+          <div className="relative h-40 w-px overflow-hidden bg-[var(--ink)]/10">
             <div
               className="memory-progress-fill absolute inset-x-0 top-0 h-full origin-top bg-[var(--accent)]"
               style={{ transform: "scaleY(0)" }}
             />
           </div>
-          <span className="text-[10px] uppercase tracking-[0.3em] text-white/35">
+          <span className="text-[10px] uppercase tracking-[0.3em] text-[var(--ink)]/35">
             {String(MEMORIES.length).padStart(2, "0")}
           </span>
         </div>
@@ -105,13 +101,13 @@ export function StackedMemories() {
               <p className="mb-3 font-display text-sm italic tracking-[0.08em] text-[var(--accent)] sm:text-base">
                 {memory.date}
               </p>
-              <h2 className="max-w-[14ch] font-display text-[clamp(2.4rem,7vw,4.5rem)] leading-[0.95] text-[var(--cream)]">
+              <h2 className="max-w-[14ch] font-display text-[clamp(2.4rem,7vw,4.5rem)] leading-[0.95] text-[var(--ink)]">
                 {memory.title}
               </h2>
-              <p className="mt-6 max-w-xl text-base leading-relaxed text-white/60 sm:text-lg">
+              <p className="muted mt-6 max-w-xl text-base leading-relaxed sm:text-lg">
                 {memory.description}
               </p>
-              <p className="mt-8 text-[11px] uppercase tracking-[0.28em] text-white/30 lg:hidden">
+              <p className="mt-8 text-[11px] uppercase tracking-[0.28em] text-[var(--ink)]/30 lg:hidden">
                 {String(i + 1).padStart(2, "0")} /{" "}
                 {String(MEMORIES.length).padStart(2, "0")}
               </p>
@@ -119,7 +115,7 @@ export function StackedMemories() {
           ))}
         </div>
 
-        <p className="hidden max-w-[10ch] text-right text-xs leading-relaxed tracking-[0.08em] text-white/30 lg:block">
+        <p className="muted hidden max-w-[10ch] text-right text-xs leading-relaxed tracking-[0.08em] lg:block">
           Baja despacio. Cada pedacito aparece a su tiempo.
         </p>
       </div>

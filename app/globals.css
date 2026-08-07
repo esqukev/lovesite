@@ -2,14 +2,15 @@
 @import "leaflet/dist/leaflet.css";
 
 :root {
-  --void: #0c0a09;
-  --ink: #1a1412;
-  --cream: #f3ebe3;
-  --accent: #e8b4b8;
-  --gold: #c4a574;
-  --muted: #8a7f76;
+  --void: #f3e8ea;
+  --ink: #2a1c22;
+  --cream: #fff7f5;
+  --accent: #c86b78;
+  --gold: #9d6b45;
+  --muted: #7d686c;
+  --line: rgba(42, 28, 34, 0.12);
   --background: var(--void);
-  --foreground: var(--cream);
+  --foreground: var(--ink);
 }
 
 @theme inline {
@@ -22,8 +23,39 @@
 html,
 body {
   background: var(--void);
-  color: var(--cream);
+  color: var(--ink);
   min-height: 100%;
+}
+
+.experience-root {
+  color: var(--ink);
+  background:
+    radial-gradient(ellipse 90% 55% at 8% 8%, rgba(232, 170, 176, 0.38), transparent 55%),
+    radial-gradient(ellipse 80% 50% at 92% 22%, rgba(255, 214, 188, 0.42), transparent 58%),
+    radial-gradient(ellipse 70% 45% at 50% 78%, rgba(232, 180, 168, 0.28), transparent 55%),
+    linear-gradient(180deg, #f8eef0 0%, #f4e6e8 40%, #f2e8e6 70%, #f7efe8 100%);
+}
+
+.experience-root .section-soft {
+  position: relative;
+}
+
+.experience-root .muted {
+  color: color-mix(in srgb, var(--ink) 55%, transparent);
+}
+
+.accent-polaroid-float {
+  animation: accentFloat 5.5s ease-in-out infinite;
+}
+
+@keyframes accentFloat {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -10px;
+  }
 }
 
 body {

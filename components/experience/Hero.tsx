@@ -5,6 +5,7 @@ import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useExperience } from "./ExperienceProvider";
+import { AccentPolaroids } from "./AccentPolaroids";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -24,8 +25,18 @@ export function Hero() {
         ease: "power4.out",
       });
 
+      gsap.from(".accent-polaroid", {
+        y: 40,
+        opacity: 0,
+        rotate: -12,
+        stagger: 0.15,
+        duration: 1.1,
+        ease: "power3.out",
+        delay: 0.3,
+      });
+
       gsap.to(".hero-big", {
-        yPercent: -20,
+        yPercent: -16,
         ease: "none",
         scrollTrigger: {
           trigger: rootRef.current,
@@ -59,12 +70,9 @@ export function Hero() {
   return (
     <section
       ref={rootRef}
-      className="relative flex min-h-[100svh] items-end overflow-hidden px-5 pb-16 pt-36 sm:px-10"
+      className="section-soft relative flex min-h-[100svh] items-end overflow-hidden px-5 pb-16 pt-36 sm:px-10"
     >
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute left-[-10%] top-[10%] h-[50vw] w-[50vw] rounded-full bg-[radial-gradient(circle,rgba(232,180,184,0.2),transparent_65%)] blur-2xl" />
-        <div className="absolute bottom-[5%] right-[-5%] h-[40vw] w-[40vw] rounded-full bg-[radial-gradient(circle,rgba(196,165,116,0.14),transparent_70%)] blur-2xl" />
-      </div>
+      <AccentPolaroids />
 
       <div className="relative z-10 w-full max-w-6xl">
         <p className="hero-big mb-4 text-xs uppercase tracking-[0.4em] text-[var(--gold)]">
@@ -72,7 +80,7 @@ export function Hero() {
         </p>
         <h1
           ref={titleRef}
-          className="hero-big max-w-[12ch] font-display text-[clamp(3.2rem,12vw,8rem)] leading-[0.9] tracking-[-0.04em] text-[var(--cream)]"
+          className="hero-big max-w-[12ch] font-display text-[clamp(3.2rem,12vw,8rem)] leading-[0.9] tracking-[-0.04em] text-[var(--ink)]"
           onPointerDown={onHoldStart}
           onPointerUp={onHoldEnd}
           onPointerLeave={onHoldEnd}
@@ -83,7 +91,7 @@ export function Hero() {
             Si sostienes esto, es porque ya sabes que eres mi hogar.
           </span>
         </h1>
-        <p className="hero-big mt-8 max-w-md text-base text-white/55 sm:text-lg">
+        <p className="hero-big muted mt-8 max-w-md text-base sm:text-lg">
           Este lugar existe únicamente para nosotros. Baja. Toca. Quédate.
         </p>
       </div>

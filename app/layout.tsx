@@ -39,7 +39,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="es"
       className={`${display.variable} ${body.variable} ${letter.variable} h-full antialiased`}
     >
-      <body className="min-h-full bg-[var(--void)] text-[var(--cream)]">
+      <body className="min-h-full bg-[var(--void)] text-[var(--ink)]">
         {children}
       </body>
     </html>
