@@ -107,6 +107,18 @@ export function Footer() {
             Insignia secreta desbloqueada
           </div>
         )}
+
+        <button
+          type="button"
+          data-cursor="hover"
+          className="footer-line mt-14 inline-flex items-center justify-center rounded-full border border-[var(--ink)]/20 px-6 py-3 text-sm text-[var(--ink)] transition hover:border-[var(--accent)] hover:bg-white/40"
+          onClick={(e) => {
+            e.stopPropagation();
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }}
+        >
+          Volver arriba
+        </button>
       </div>
     </footer>
   );

@@ -26,26 +26,16 @@ export function Reasons() {
   const rootRef = useRef<HTMLElement>(null);
   const heartRef = useRef<HTMLButtonElement>(null);
   const textRef = useRef<HTMLParagraphElement>(null);
-  const hintRef = useRef<HTMLSpanElement>(null);
   const { discoverEgg } = useExperience();
 
   useGSAP(
     () => {
       const heart = heartRef.current;
-      const hint = hintRef.current;
-      if (!heart || !hint) return;
+      if (!heart) return;
 
       gsap.to(heart, {
         scale: 1.035,
         duration: 1.4,
-        yoyo: true,
-        repeat: -1,
-        ease: "sine.inOut",
-      });
-
-      gsap.to(hint, {
-        opacity: 0.35,
-        duration: 1.1,
         yoyo: true,
         repeat: -1,
         ease: "sine.inOut",
@@ -170,17 +160,6 @@ export function Reasons() {
               </p>
             </div>
           </button>
-
-          <span
-            ref={hintRef}
-            className="mt-6 flex items-center gap-2 text-[11px] uppercase tracking-[0.32em] text-[var(--ink)]/50"
-          >
-            <span className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
-            Toca para otra razón
-            <span className="tabular-nums text-[var(--ink)]/35">
-              {Math.min(revealed + 1, REASONS.length)}/{REASONS.length}
-            </span>
-          </span>
         </div>
       </div>
     </section>

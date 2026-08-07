@@ -21,9 +21,9 @@ export function PlacesMap() {
   return (
     <section
       id="mapa"
-      className="section-soft relative px-5 py-16 sm:px-8 sm:py-20"
+      className="section-soft relative z-10 px-5 py-16 sm:px-8 sm:py-20"
     >
-      <div className="mx-auto max-w-6xl">
+      <div className="relative z-10 mx-auto max-w-6xl">
         <div className="mb-10 max-w-xl">
           <p className="mb-3 text-xs uppercase tracking-[0.35em] text-[var(--gold)]">
             Lugares

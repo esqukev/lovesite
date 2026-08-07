@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type MouseEvent } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { gsap } from "gsap";
 import { useExperience } from "./ExperienceProvider";
@@ -22,10 +22,8 @@ const SPOTS: Spot[] = [
   { top: "32%", right: "5%", side: "right" },
   { top: "58%", left: "6%", side: "left" },
   { top: "72%", right: "4%", side: "right" },
-  { top: "22%", left: "42%", side: "left" },
   { top: "48%", right: "18%", side: "right" },
   { top: "78%", left: "28%", side: "left" },
-  { top: "14%", right: "28%", side: "right" },
 ];
 
 function CatSvg({ className }: { className?: string }) {
@@ -46,12 +44,6 @@ function CatSvg({ className }: { className?: string }) {
         fill="none"
         strokeLinecap="round"
       />
-      <path
-        d="M20 34h-8M44 34h8M22 38h-6M42 38h6"
-        stroke="currentColor"
-        strokeWidth="1.2"
-        opacity="0.55"
-      />
     </svg>
   );
 }
@@ -64,10 +56,10 @@ type Bubble = {
 };
 
 function clampBubble(side: "left" | "right", catRect: DOMRect) {
-  const width = Math.min(window.innerWidth * 0.86, 280);
+  const width = Math.min(window.innerWidth * 0.86, 260);
   const margin = 12;
   let left: number;
-  let top = catRect.top - 12;
+  const top = Math.max(margin + 40, Math.min(catRect.top - 12, window.innerHeight - 160));
 
   if (side === "right") {
     left = catRect.left - width - 8;
@@ -76,8 +68,6 @@ function clampBubble(side: "left" | "right", catRect: DOMRect) {
   }
 
   left = Math.max(margin, Math.min(left, window.innerWidth - width - margin));
-  top = Math.max(margin + 40, Math.min(top, window.innerHeight - 160));
-
   return { left, top };
 }
 
@@ -97,8 +87,8 @@ export function CatSquad({ active }: { active: boolean }) {
   const cycleTimer = useRef<number | null>(null);
   const usedSpots = useRef<number[]>([]);
   const idRef = useRef(0);
-  const paused = useRef(false);
-  const bubbleOpen = useRef(false);
+  const busy = useRef(false);
+  const ignoreOutsideUntil = useRef(0);
 
   const pickSpot = useCallback(() => {
     const available = SPOTS.map((_, i) => i).filter(
@@ -113,7 +103,7 @@ export function CatSquad({ active }: { active: boolean }) {
   const spawn = useCallback(() => {
     idRef.current += 1;
     setBubble(null);
-    bubbleOpen.current = false;
+    busy.current = false;
     setCat({
       id: idRef.current,
       spotIndex: pickSpot(),
@@ -121,42 +111,41 @@ export function CatSquad({ active }: { active: boolean }) {
     });
   }, [pickSpot]);
 
-  const dismissAll = useCallback(() => {
+  const closePopupAndCat = useCallback(() => {
     if (hideTimer.current) window.clearTimeout(hideTimer.current);
+    hideTimer.current = null;
     setBubble(null);
-    bubbleOpen.current = false;
     setCat(null);
-    paused.current = false;
+    busy.current = false;
   }, []);
 
   useEffect(() => {
     if (!active) {
-      dismissAll();
+      closePopupAndCat();
       return;
     }
 
     let cancelled = false;
 
-    const scheduleNext = (delay: number) => {
+    const scheduleHide = (delay: number) => {
       if (cycleTimer.current) window.clearTimeout(cycleTimer.current);
       cycleTimer.current = window.setTimeout(() => {
-        if (cancelled || paused.current || bubbleOpen.current) {
-          scheduleNext(800);
+        if (cancelled || busy.current) {
+          scheduleHide(600);
           return;
         }
         setCat(null);
-        setBubble(null);
         cycleTimer.current = window.setTimeout(() => {
           if (cancelled) return;
           spawn();
-          scheduleNext(5500 + Math.random() * 4500);
-        }, 2200 + Math.random() * 2500);
+          scheduleHide(6000 + Math.random() * 4000);
+        }, 2000 + Math.random() * 2000);
       }, delay);
     };
 
     const first = window.setTimeout(() => {
       spawn();
-      scheduleNext(5500 + Math.random() * 4500);
+      scheduleHide(6000 + Math.random() * 4000);
     }, 2800);
 
     return () => {
@@ -165,43 +154,46 @@ export function CatSquad({ active }: { active: boolean }) {
       if (cycleTimer.current) window.clearTimeout(cycleTimer.current);
       if (hideTimer.current) window.clearTimeout(hideTimer.current);
     };
-  }, [active, spawn, dismissAll]);
+  }, [active, spawn, closePopupAndCat]);
 
   useEffect(() => {
     const el = catRef.current;
     if (!el || !cat) return;
     gsap.fromTo(
       el,
-      { opacity: 0, y: 18, scale: 0.7 },
-      { opacity: 1, y: 0, scale: 1, duration: 0.55, ease: "back.out(1.7)" },
+      { autoAlpha: 0, y: 16, scale: 0.75 },
+      { autoAlpha: 1, y: 0, scale: 1, duration: 0.5, ease: "back.out(1.6)" },
     );
     const bob = gsap.to(el, {
-      y: -10,
+      y: -8,
       duration: 1.2,
       yoyo: true,
       repeat: -1,
       ease: "sine.inOut",
-      delay: 0.55,
+      delay: 0.5,
     });
     return () => {
       bob.kill();
       gsap.killTweensOf(el);
     };
-  }, [cat]);
+  }, [cat?.id]);
 
   useEffect(() => {
     if (!bubble) return;
     const onPointerDown = (e: PointerEvent) => {
+      if (performance.now() < ignoreOutsideUntil.current) return;
       const t = e.target as Node;
       if (catRef.current?.contains(t)) return;
       if (bubbleRef.current?.contains(t)) return;
-      dismissAll();
+      closePopupAndCat();
     };
-    document.addEventListener("pointerdown", onPointerDown);
-    return () => document.removeEventListener("pointerdown", onPointerDown);
-  }, [bubble, dismissAll]);
+    document.addEventListener("pointerdown", onPointerDown, true);
+    return () => document.removeEventListener("pointerdown", onPointerDown, true);
+  }, [bubble, closePopupAndCat]);
 
-  const meow = () => {
+  const meow = (e: MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
     const el = catRef.current;
     if (!el || !cat) return;
     const spot = SPOTS[cat.spotIndex];
@@ -212,32 +204,34 @@ export function CatSquad({ active }: { active: boolean }) {
     const rect = el.getBoundingClientRect();
     const pos = clampBubble(spot.side, rect);
     if (hideTimer.current) window.clearTimeout(hideTimer.current);
-    paused.current = true;
-    bubbleOpen.current = true;
+
+    busy.current = true;
+    ignoreOutsideUntil.current = performance.now() + 350;
+
     setBubble({
       text: CAT_LINES[Math.floor(Math.random() * CAT_LINES.length)],
       ...pos,
       side: spot.side,
     });
+
     gsap.fromTo(
-      el,
+      el.querySelector("svg"),
       { scale: 1 },
-      { scale: 1.18, duration: 0.15, yoyo: true, repeat: 1 },
+      { scale: 1.15, duration: 0.14, yoyo: true, repeat: 1, transformOrigin: "50% 50%" },
     );
+
+    // Popup 3s → then cat leaves with the popup
     hideTimer.current = window.setTimeout(() => {
-      setBubble(null);
-      bubbleOpen.current = false;
-      paused.current = false;
+      closePopupAndCat();
     }, 3000);
   };
 
   if (!active) return null;
-
   const spot = cat ? SPOTS[cat.spotIndex] : null;
 
   return (
     <>
-      <AnimatePresence mode="wait">
+      <AnimatePresence>
         {cat && spot && (
           <motion.button
             key={cat.id}
@@ -245,13 +239,10 @@ export function CatSquad({ active }: { active: boolean }) {
             type="button"
             aria-label="Gatito escondido"
             data-cursor="hover"
-            onClick={(e) => {
-              e.stopPropagation();
-              meow();
-            }}
+            onClick={meow}
             initial={{ opacity: 0 }}
-            exit={{ opacity: 0, scale: 0.6, y: 12 }}
-            transition={{ duration: 0.35 }}
+            exit={{ opacity: 0, scale: 0.7, y: 10 }}
+            transition={{ duration: 0.3 }}
             className={`fixed z-[46] touch-manipulation rounded-full p-2 drop-shadow-[0_8px_24px_rgba(232,180,184,0.4)] ${
               cat.tint === "accent" ? "text-[var(--accent)]" : "text-[var(--gold)]"
             }`}
@@ -270,19 +261,18 @@ export function CatSquad({ active }: { active: boolean }) {
         {bubble && (
           <div
             ref={bubbleRef}
-            className="fixed z-[80] w-[min(86vw,280px)] -translate-y-full"
+            className="fixed z-[80] w-[min(86vw,260px)] -translate-y-full"
             style={{ left: bubble.left, top: bubble.top }}
-            onClick={(e) => e.stopPropagation()}
           >
             <motion.div
               key={bubble.text + bubble.left}
-              initial={{ opacity: 0, y: 14, scale: 0.9 }}
+              initial={{ opacity: 0, y: 12, scale: 0.92 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -8, scale: 0.94 }}
-              transition={{ type: "spring", stiffness: 240, damping: 18 }}
+              exit={{ opacity: 0, y: -6, scale: 0.94 }}
+              transition={{ type: "spring", stiffness: 260, damping: 20 }}
             >
-              <div className="speech-bubble speech-bubble-pop">
-                <p className="text-[15px] leading-relaxed text-[var(--ink)] sm:text-base">
+              <div className="speech-bubble speech-bubble-pop text-center">
+                <p className="text-center text-[15px] leading-relaxed text-[var(--ink)] sm:text-base">
                   {bubble.text}
                 </p>
                 <span

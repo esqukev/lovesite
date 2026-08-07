@@ -1,33 +1,11 @@
 "use client";
 
-import Image from "next/image";
 import { useRef } from "react";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
-
-function Polaroid({
-  src,
-  sizeClass,
-  rotate,
-}: {
-  src: string;
-  sizeClass: string;
-  rotate: string;
-}) {
-  return (
-    <div
-      className={`overflow-hidden rounded-md bg-white p-1 shadow-[0_12px_28px_rgba(42,28,34,0.14)] ring-1 ring-black/5 ${sizeClass}`}
-      style={{ rotate }}
-    >
-      <div className="relative aspect-square w-full overflow-hidden rounded-sm">
-        <Image src={src} alt="" fill className="object-cover" sizes="100px" />
-      </div>
-    </div>
-  );
-}
 
 function CatMini({ className }: { className?: string }) {
   return (
@@ -50,7 +28,6 @@ function DogMini({ className }: { className?: string }) {
       <path fill="currentColor" d="M16 28c-6-2-10 4-8 8l8-2M48 28c6-2 10 4 8 8l-8-2" />
       <circle cx="26" cy="34" r="2" fill="#2a1c22" />
       <circle cx="38" cy="34" r="2" fill="#2a1c22" />
-      <ellipse cx="32" cy="40" rx="3" ry="2" fill="#2a1c22" opacity="0.5" />
     </svg>
   );
 }
@@ -65,12 +42,11 @@ function FrogMini({ className }: { className?: string }) {
       <circle cx="44" cy="24" r="3.5" fill="#fff" />
       <circle cx="21" cy="24" r="1.6" fill="#2a1c22" />
       <circle cx="45" cy="24" r="1.6" fill="#2a1c22" />
-      <path d="M24 42c4 3 12 3 16 0" stroke="#2a1c22" strokeWidth="1.5" fill="none" />
     </svg>
   );
 }
 
-/** Decorative polaroids + animals; move with scroll */
+/** Animals only — no polaroids over section text */
 export function SiteWarmth() {
   const rootRef = useRef<HTMLDivElement>(null);
 
@@ -79,35 +55,17 @@ export function SiteWarmth() {
       gsap.utils.toArray<HTMLElement>(".scroll-critter").forEach((el, i) => {
         gsap.fromTo(
           el,
-          { y: 50, opacity: 0.15, rotate: i % 2 ? -14 : 14 },
+          { y: 60, opacity: 0.2, rotate: i % 2 ? -16 : 16 },
           {
-            y: -100 - i * 24,
-            opacity: 0.9,
-            rotate: i % 2 ? 10 : -10,
+            y: -120 - i * 18,
+            opacity: 0.85,
+            rotate: i % 2 ? 12 : -12,
             ease: "none",
             scrollTrigger: {
               trigger: document.documentElement,
               start: "top top",
               end: "bottom bottom",
-              scrub: 1.2,
-            },
-          },
-        );
-      });
-
-      gsap.utils.toArray<HTMLElement>(".warm-polaroid").forEach((el) => {
-        gsap.fromTo(
-          el,
-          { y: 40, opacity: 0 },
-          {
-            y: -50,
-            opacity: 1,
-            ease: "none",
-            scrollTrigger: {
-              trigger: el,
-              start: "top 95%",
-              end: "top 35%",
-              scrub: true,
+              scrub: 1.15,
             },
           },
         );
@@ -119,42 +77,38 @@ export function SiteWarmth() {
   return (
     <div
       ref={rootRef}
-      className="pointer-events-none absolute inset-x-0 top-0 z-[2] h-full overflow-hidden"
+      className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-full overflow-hidden"
       aria-hidden
     >
-      <div className="warm-polaroid absolute left-[3%] top-[18%]">
-        <Polaroid src="/foto4.jpeg" sizeClass="w-16 sm:w-20" rotate="-9deg" />
-      </div>
-      <div className="warm-polaroid absolute right-[4%] top-[26%]">
-        <Polaroid src="/foto8.jpeg" sizeClass="w-[4.5rem] sm:w-24" rotate="7deg" />
-      </div>
-      <div className="warm-polaroid absolute left-[5%] top-[42%]">
-        <Polaroid src="/foto6.jpeg" sizeClass="w-[4.25rem] sm:w-20" rotate="5deg" />
-      </div>
-      <div className="warm-polaroid absolute right-[6%] top-[52%]">
-        <Polaroid src="/foto11.jpeg" sizeClass="w-16 sm:w-20" rotate="-7deg" />
-      </div>
-      <div className="warm-polaroid absolute left-[8%] top-[68%]">
-        <Polaroid src="/foto15.jpeg" sizeClass="w-[4.5rem] sm:w-24" rotate="6deg" />
-      </div>
-      <div className="warm-polaroid absolute right-[5%] top-[78%]">
-        <Polaroid src="/foto9.jpeg" sizeClass="w-16 sm:w-20" rotate="-5deg" />
-      </div>
-
-      <div className="scroll-critter absolute left-[12%] top-[22%] text-[var(--accent)]">
-        <CatMini className="h-10 w-10 sm:h-12 sm:w-12" />
-      </div>
-      <div className="scroll-critter absolute right-[12%] top-[38%] text-[#7a9e6a]">
-        <FrogMini className="h-10 w-10 sm:h-12 sm:w-12" />
-      </div>
-      <div className="scroll-critter absolute left-[18%] top-[58%] text-[var(--gold)]">
-        <DogMini className="h-10 w-10 sm:h-12 sm:w-12" />
-      </div>
-      <div className="scroll-critter absolute right-[16%] top-[72%] text-[var(--accent)]">
+      <div className="scroll-critter absolute left-[3%] top-[20%] text-[var(--accent)]">
         <CatMini className="h-9 w-9 sm:h-11 sm:w-11" />
       </div>
-      <div className="scroll-critter absolute left-[10%] top-[85%] text-[#7a9e6a]">
+      <div className="scroll-critter absolute right-[3%] top-[24%] text-[#7a9e6a]">
+        <FrogMini className="h-10 w-10 sm:h-12 sm:w-12" />
+      </div>
+      <div className="scroll-critter absolute left-[2%] top-[36%] text-[var(--gold)]">
+        <DogMini className="h-9 w-9 sm:h-11 sm:w-11" />
+      </div>
+      <div className="scroll-critter absolute right-[2%] top-[40%] text-[var(--accent)]">
+        <CatMini className="h-8 w-8 sm:h-10 sm:w-10" />
+      </div>
+      <div className="scroll-critter absolute left-[4%] top-[55%] text-[#7a9e6a]">
         <FrogMini className="h-9 w-9 sm:h-11 sm:w-11" />
+      </div>
+      <div className="scroll-critter absolute right-[4%] top-[58%] text-[var(--gold)]">
+        <DogMini className="h-8 w-8 sm:h-10 sm:w-10" />
+      </div>
+      <div className="scroll-critter absolute left-[3%] top-[70%] text-[var(--accent)]">
+        <CatMini className="h-9 w-9 sm:h-11 sm:w-11" />
+      </div>
+      <div className="scroll-critter absolute right-[3%] top-[74%] text-[#7a9e6a]">
+        <FrogMini className="h-10 w-10 sm:h-12 sm:w-12" />
+      </div>
+      <div className="scroll-critter absolute left-[5%] top-[86%] text-[var(--gold)]">
+        <DogMini className="h-9 w-9 sm:h-11 sm:w-11" />
+      </div>
+      <div className="scroll-critter absolute right-[5%] top-[88%] text-[var(--accent)]">
+        <CatMini className="h-8 w-8 sm:h-10 sm:w-10" />
       </div>
     </div>
   );

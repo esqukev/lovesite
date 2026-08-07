@@ -31,11 +31,28 @@ export function Gallery() {
   const { discoverEgg } = useExperience();
   const spots = useRef(buildSpots(GALLERY_IMAGES.length)).current;
   const dragMoved = useRef(false);
+  const hovering = useRef<Element | null>(null);
 
   useEffect(() => {
     const board = boardRef.current;
     if (!board) return;
     const cards = gsap.utils.toArray<HTMLElement>(".polaroid", board);
+
+    const onEnter = (e: Event) => {
+      const el = e.currentTarget as HTMLElement;
+      hovering.current = el;
+      gsap.to(el, { scale: 1.14, duration: 0.28, ease: "power2.out", zIndex: 40 });
+    };
+    const onLeave = (e: Event) => {
+      const el = e.currentTarget as HTMLElement;
+      if (hovering.current === el) hovering.current = null;
+      gsap.to(el, { scale: 1, duration: 0.28, ease: "power2.out" });
+    };
+
+    cards.forEach((card) => {
+      card.addEventListener("pointerenter", onEnter);
+      card.addEventListener("pointerleave", onLeave);
+    });
 
     const draggables = Draggable.create(cards, {
       bounds: board,
@@ -44,7 +61,7 @@ export function Gallery() {
       inertia: true,
       onPress() {
         dragMoved.current = false;
-        gsap.to(this.target, { scale: 1.1, duration: 0.22, zIndex: 50 });
+        gsap.to(this.target, { scale: 1.12, duration: 0.2, zIndex: 50 });
       },
       onDrag() {
         dragMoved.current = true;
@@ -61,9 +78,18 @@ export function Gallery() {
     });
 
     return () => {
+      cards.forEach((card) => {
+        card.removeEventListener("pointerenter", onEnter);
+        card.removeEventListener("pointerleave", onLeave);
+      });
       draggables.forEach((d) => d.kill());
     };
   }, [discoverEgg]);
+
+  const close = () => {
+    setActive(null);
+    setOrigin(null);
+  };
 
   const openPhoto = (index: number, el: HTMLElement) => {
     if (dragMoved.current) return;
@@ -80,7 +106,7 @@ export function Gallery() {
   return (
     <section
       id="galeria"
-      className="section-soft relative px-4 py-16 sm:px-6 sm:py-20"
+      className="section-soft relative z-10 px-4 py-16 sm:px-6 sm:py-20"
     >
       <div className="mx-auto mb-8 max-w-3xl text-center">
         <p className="mb-3 text-xs uppercase tracking-[0.35em] text-[var(--gold)]">
@@ -104,7 +130,7 @@ export function Gallery() {
             <button
               key={img.src + index}
               type="button"
-              className="polaroid absolute w-[42%] max-w-[180px] origin-center cursor-grab touch-manipulation will-change-transform transition-transform duration-300 ease-out hover:z-40 hover:scale-110 active:cursor-grabbing sm:w-[22%] sm:max-w-[200px]"
+              className="polaroid absolute w-[42%] max-w-[180px] origin-center cursor-grab touch-manipulation will-change-transform active:cursor-grabbing sm:w-[22%] sm:max-w-[200px]"
               style={{
                 left: `${spot.x}%`,
                 top: `${spot.y}%`,
@@ -134,35 +160,36 @@ export function Gallery() {
       <AnimatePresence>
         {active !== null && origin && (
           <motion.div
-            className="fixed inset-0 z-[80] flex items-center justify-center bg-[rgba(42,28,34,0.72)] p-4"
+            className="fixed inset-0 z-[200] flex items-center justify-center bg-[rgba(42,28,34,0.78)] p-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => setActive(null)}
+            onClick={close}
           >
             <button
               type="button"
-              className="absolute right-5 top-5 z-10 rounded-full border border-white/20 bg-white/15 p-2 text-white"
-              onClick={() => setActive(null)}
+              className="absolute right-5 top-5 z-[210] flex h-11 w-11 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                close();
+              }}
               aria-label="Cerrar"
             >
-              <X size={18} />
+              <X size={20} />
             </button>
             <motion.div
-              className="relative h-[78vh] w-full max-w-4xl overflow-hidden rounded-2xl bg-white p-2"
+              className="relative h-[78vh] w-full max-w-4xl"
               initial={{
                 opacity: 0.7,
                 scale: Math.min(origin.w / 480, 0.28),
                 x: origin.x - window.innerWidth / 2,
                 y: origin.y - window.innerHeight / 2,
-                borderRadius: 12,
               }}
               animate={{
                 opacity: 1,
                 scale: 1,
                 x: 0,
                 y: 0,
-                borderRadius: 24,
               }}
               exit={{
                 opacity: 0,
@@ -172,16 +199,14 @@ export function Gallery() {
               transition={{ type: "spring", stiffness: 160, damping: 20 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="relative h-full w-full overflow-hidden rounded-xl">
-                <Image
-                  src={GALLERY_IMAGES[active].src}
-                  alt=""
-                  fill
-                  className="object-contain"
-                  sizes="100vw"
-                  priority
-                />
-              </div>
+              <Image
+                src={GALLERY_IMAGES[active].src}
+                alt=""
+                fill
+                className="object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.45)]"
+                sizes="100vw"
+                priority
+              />
             </motion.div>
           </motion.div>
         )}

@@ -163,14 +163,17 @@ body {
   width: 6px;
   height: 6px;
   background: var(--accent);
-  mix-blend-mode: difference;
 }
 
 .cursor-ring {
   width: 34px;
   height: 34px;
-  border: 1px solid rgba(243, 235, 227, 0.45);
-  opacity: 0.55;
+  border: 1px solid rgba(42, 28, 34, 0.28);
+  opacity: 0.45;
+}
+
+.speech-bubble p {
+  text-align: center;
 }
 
 @keyframes scrollPulse {
