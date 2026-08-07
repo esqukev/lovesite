@@ -11,6 +11,8 @@ const CAT_LINES = [
   "ronroneo activado por Motzy",
   "¿ya le dijiste que la amas hoy?",
   "misión: hacerla sonreír ✓",
+  "si esto fuera un juego, ella sería el final bueno",
+  "tip: toca las estrellitas para ganar XP",
 ];
 
 function CatSvg({ className }: { className?: string }) {
@@ -41,13 +43,19 @@ function CatSvg({ className }: { className?: string }) {
   );
 }
 
+type Bubble = {
+  text: string;
+  x: number;
+  y: number;
+  side: "left" | "right";
+};
+
 export function CatSquad({ active }: { active: boolean }) {
   const { discoverEgg } = useExperience();
   const catA = useRef<HTMLButtonElement>(null);
   const catB = useRef<HTMLButtonElement>(null);
-  const [bubble, setBubble] = useState<{ text: string; x: number; y: number } | null>(
-    null,
-  );
+  const [bubble, setBubble] = useState<Bubble | null>(null);
+  const hideTimer = useRef<number | null>(null);
 
   useEffect(() => {
     if (!active) return;
@@ -55,26 +63,25 @@ export function CatSquad({ active }: { active: boolean }) {
     const b = catB.current;
     if (!a || !b) return;
 
+    const mm = window.matchMedia("(max-width: 640px)");
+    const walkX = () => (mm.matches ? window.innerWidth * 0.42 : window.innerWidth * 0.55);
+
     const tl = gsap.timeline({ repeat: -1 });
-    tl.to(a, {
-      x: () => window.innerWidth * 0.55,
-      duration: 14,
-      ease: "sine.inOut",
-    })
-      .to(a, { scaleX: -1, duration: 0.2 }, ">")
-      .to(a, { x: 0, duration: 14, ease: "sine.inOut" })
+    tl.to(a, { x: walkX, duration: 12, ease: "sine.inOut" })
+      .to(a, { scaleX: -1, duration: 0.2 })
+      .to(a, { x: 0, duration: 12, ease: "sine.inOut" })
       .to(a, { scaleX: 1, duration: 0.2 });
 
     gsap.to(b, {
-      y: -14,
-      duration: 1.1,
+      y: -16,
+      duration: 1.05,
       yoyo: true,
       repeat: -1,
       ease: "sine.inOut",
     });
     gsap.to(b, {
-      rotation: 6,
-      duration: 2.2,
+      rotation: 8,
+      duration: 2,
       yoyo: true,
       repeat: -1,
       ease: "sine.inOut",
@@ -86,21 +93,27 @@ export function CatSquad({ active }: { active: boolean }) {
     };
   }, [active]);
 
-  const meow = (el: HTMLElement | null) => {
+  const meow = (el: HTMLElement | null, side: "left" | "right") => {
     if (!el) return;
-    discoverEgg("cat-meow");
+    discoverEgg("cat-meow", {
+      title: "Gatito activado",
+      detail: "Te dejó un mensaje ♥",
+    });
     const rect = el.getBoundingClientRect();
+    if (hideTimer.current) window.clearTimeout(hideTimer.current);
     setBubble({
       text: CAT_LINES[Math.floor(Math.random() * CAT_LINES.length)],
       x: rect.left + rect.width / 2,
       y: rect.top,
+      side,
     });
     gsap.fromTo(
       el,
       { scale: 1 },
-      { scale: 1.2, duration: 0.15, yoyo: true, repeat: 1 },
+      { scale: 1.22, duration: 0.16, yoyo: true, repeat: 1 },
     );
-    window.setTimeout(() => setBubble(null), 2400);
+    // Enough time to actually read on mobile
+    hideTimer.current = window.setTimeout(() => setBubble(null), 7500);
   };
 
   if (!active) return null;
@@ -112,10 +125,10 @@ export function CatSquad({ active }: { active: boolean }) {
         type="button"
         aria-label="Gatito explorador"
         data-cursor="hover"
-        onClick={() => meow(catA.current)}
-        className="fixed bottom-8 left-4 z-[45] text-[var(--accent)] drop-shadow-[0_8px_24px_rgba(232,180,184,0.45)]"
+        onClick={() => meow(catA.current, "left")}
+        className="fixed bottom-[5.5rem] left-3 z-[46] touch-manipulation rounded-full p-2 text-[var(--accent)] drop-shadow-[0_8px_24px_rgba(232,180,184,0.45)] sm:bottom-8 sm:left-4"
       >
-        <CatSvg className="h-12 w-12 sm:h-14 sm:w-14" />
+        <CatSvg className="h-14 w-14 sm:h-16 sm:w-16" />
       </button>
 
       <button
@@ -123,22 +136,31 @@ export function CatSquad({ active }: { active: boolean }) {
         type="button"
         aria-label="Gatito saltarín"
         data-cursor="hover"
-        onClick={() => meow(catB.current)}
-        className="fixed bottom-24 right-6 z-[45] text-[var(--gold)] drop-shadow-[0_8px_24px_rgba(196,165,116,0.4)]"
+        onClick={() => meow(catB.current, "right")}
+        className="fixed bottom-[9.5rem] right-3 z-[46] touch-manipulation rounded-full p-2 text-[var(--gold)] drop-shadow-[0_8px_24px_rgba(196,165,116,0.4)] sm:bottom-28 sm:right-6"
       >
-        <CatSvg className="h-10 w-10 sm:h-12 sm:w-12" />
+        <CatSvg className="h-12 w-12 sm:h-14 sm:w-14" />
       </button>
 
       <AnimatePresence>
         {bubble && (
           <motion.div
-            initial={{ opacity: 0, y: 8, scale: 0.95 }}
+            key={bubble.text + bubble.x}
+            initial={{ opacity: 0, y: 16, scale: 0.86 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -6 }}
-            className="pointer-events-none fixed z-[70] max-w-[200px] -translate-x-1/2 -translate-y-full rounded-2xl border border-white/15 bg-black/75 px-3 py-2 text-center text-xs text-[var(--cream)] backdrop-blur-md"
-            style={{ left: bubble.x, top: bubble.y - 8 }}
+            exit={{ opacity: 0, y: -10, scale: 0.94 }}
+            transition={{ type: "spring", stiffness: 260, damping: 18 }}
+            className="pointer-events-none fixed z-[80] w-[min(78vw,260px)] -translate-x-1/2 -translate-y-[110%]"
+            style={{ left: bubble.x, top: bubble.y }}
           >
-            {bubble.text}
+            <div className="speech-bubble">
+              <p className="text-sm leading-relaxed text-[var(--ink)] sm:text-[15px]">
+                {bubble.text}
+              </p>
+              <span
+                className={`speech-tail ${bubble.side === "right" ? "speech-tail-right" : ""}`}
+              />
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

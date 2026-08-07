@@ -107,7 +107,8 @@ export function Hero() {
       </div>
 
       <div className="hero-content relative z-10 mx-auto max-w-4xl text-center">
-        <p className="hero-reveal mb-6 text-xs uppercase tracking-[0.4em] text-[var(--gold)]">
+        <p className="hero-reveal mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/35 px-3 py-1.5 text-[10px] uppercase tracking-[0.35em] text-[var(--gold)] backdrop-blur-md">
+          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[var(--accent)]" />
           Nivel 01 · Solo nosotros
         </p>
         <h1

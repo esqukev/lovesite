@@ -35,7 +35,7 @@ export function FloatingHearts({ active }: { active: boolean }) {
         onComplete: () => heart.remove(),
       });
 
-      timeout = window.setTimeout(spawn, 700 + Math.random() * 1400);
+      timeout = window.setTimeout(spawn, 380 + Math.random() * 900);
     };
 
     spawn();
