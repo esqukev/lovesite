@@ -8,7 +8,7 @@ import { MEMORIES } from "@/lib/data";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
-/** Scroll-pinned memory chapters — text only, no photo cards */
+/** Scroll-pinned memory chapters — text only, one visible at a time */
 export function StackedMemories() {
   const rootRef = useRef<HTMLElement>(null);
 
@@ -21,8 +21,8 @@ export function StackedMemories() {
       const progress = root.querySelector<HTMLElement>(".memory-progress-fill");
       const indexEl = root.querySelector<HTMLElement>(".memory-index");
 
-      gsap.set(panels, { autoAlpha: 0, y: 36 });
-      gsap.set(panels[0], { autoAlpha: 1, y: 0 });
+      gsap.set(panels, { autoAlpha: 0, y: 28, visibility: "hidden" });
+      gsap.set(panels[0], { autoAlpha: 1, y: 0, visibility: "visible" });
 
       const tl = gsap.timeline({
         scrollTrigger: {
@@ -51,13 +51,25 @@ export function StackedMemories() {
         const at = i;
         tl.to(
           prev,
-          { autoAlpha: 0, y: -28, duration: 0.45, ease: "power2.inOut" },
+          {
+            autoAlpha: 0,
+            y: -24,
+            visibility: "hidden",
+            duration: 0.4,
+            ease: "power2.inOut",
+          },
           at,
         );
         tl.fromTo(
           panel,
-          { autoAlpha: 0, y: 36 },
-          { autoAlpha: 1, y: 0, duration: 0.55, ease: "power2.out" },
+          { autoAlpha: 0, y: 28, visibility: "hidden" },
+          {
+            autoAlpha: 1,
+            y: 0,
+            visibility: "visible",
+            duration: 0.5,
+            ease: "power2.out",
+          },
           at + 0.05,
         );
       });
@@ -96,6 +108,7 @@ export function StackedMemories() {
             <article
               key={memory.id}
               className="memory-panel absolute inset-0 flex flex-col justify-center"
+              style={{ visibility: i === 0 ? "visible" : "hidden" }}
               aria-hidden={i !== 0}
             >
               <p className="mb-3 font-display text-sm italic tracking-[0.08em] text-[var(--accent)] sm:text-base">

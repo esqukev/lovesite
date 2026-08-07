@@ -66,13 +66,13 @@ export function PaperLetter({ onStart }: { onStart: () => void }) {
   return (
     <div
       ref={rootRef}
-      className="fixed inset-0 z-40 flex items-center justify-center bg-[#120e0c] px-4 py-10"
+      className="fixed inset-0 z-40 flex items-center justify-center bg-[#f3e8ea] px-4 py-10"
       style={{ perspective: 1200 }}
     >
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(232,180,184,0.14),transparent_45%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(232,170,176,0.45),transparent_50%),radial-gradient(ellipse_at_bottom,rgba(255,214,188,0.35),transparent_55%)]" />
 
       <div className="paper-shell relative w-full max-w-lg" style={{ transformStyle: "preserve-3d" }}>
-        <h2 className="mb-6 text-center font-display text-[clamp(1.85rem,5vw,2.6rem)] italic leading-tight tracking-[-0.02em] text-[var(--cream)]">
+        <h2 className="mb-6 text-center font-display text-[clamp(1.85rem,5vw,2.6rem)] italic leading-tight tracking-[-0.02em] text-[var(--ink)]">
           Una carta para mi amor
         </h2>
 
@@ -90,7 +90,7 @@ export function PaperLetter({ onStart }: { onStart: () => void }) {
                 ♥
               </div>
             </div>
-            <p className="mt-4 text-center text-sm text-white/55">
+            <p className="mt-4 text-center text-sm text-[var(--ink)]/50">
               Toca el sobre para abrirla
             </p>
           </button>
