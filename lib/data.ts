@@ -16,39 +16,39 @@ export const MEMORIES = [
     title: "Mi cumpleaños",
     date: "26 Febrero",
     description:
-      "El regalito de cumpleaños fue algo que jamás esperaba... Un gesto que todavía me hace sonreír cada vez que lo recuerdo.",
+      "El regalito de cumpleaños fue algo que jamás esperaba y me sentí tan enamorado y la foto que me hizo fue algo especial.",
     image: "/foto.jpeg",
   },
   {
     id: "te-amo",
-    title: "Primer te amo",
-    date: "Un instante eterno",
+    title: "El primer te amo",
+    date: "Por ahí de Febrero",
     description:
-      "Esas tres palabras cambiaron la gravedad de todo. Desde entonces, el mundo se siente un poco más nuestro.",
+      "Recuerdo la primera vez que me dijo te amo, estaba casi dormida pero yo sentí como si se me hubiera salido el corazón. Era algo que ya venía sintiendo hace tiempo y para mi fue como un alivio saber que también sentía lo mismo.",
     image: "/foto2.jpeg",
   },
   {
     id: "citas",
     title: "Las primeras citas",
-    date: "El comienzo",
+    date: "Por ahí de Diciembre-Enero",
     description:
-      "Nervios, risas y la certeza de que quería seguir conociéndote una y otra vez.",
+      "No sabía que estaba pasando al inicio pero esas salidas me hacían sentir lindo. Sentía que teniamos quimica y que algo bonito podía pasar entre nosotros.",
     image: "/foto4.jpeg",
   },
   {
     id: "visita",
     title: "Primera visita",
-    date: "Casa y hogar",
+    date: "Enero-Febrero",
     description:
-      "Cuando el espacio se llenó de tu presencia y todo empezó a sentirse más cálido.",
+      "Recuerdo cuando me dijo que debía ir a pedir la mano, pero recuerdo más cuando me tocaba, estaba tan pero tan nervioso. Una vez que lo hice me sentí tan bien, sentía que ya estabamos teniendo algo único.",
     image: "/foto5.jpeg",
   },
   {
     id: "baile",
     title: "Mi primer baile",
-    date: "Solo nosotros",
+    date: "Febrero-Marzo",
     description:
-      "Sin escenario, sin público. Solo el ritmo, tus manos y un recuerdo que no se borra.",
+      "Mi primer baile fue tan divertido, usted enseñandome a bailar por primera vez, llevandome al rancho y yo sin ninguna verguenza haciendo todo por mi amor y pasandola bomba.",
     image: "/foto6.jpeg",
   },
   {
