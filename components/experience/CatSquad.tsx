@@ -78,13 +78,15 @@ type CatInstance = {
 };
 
 export function CatSquad({ active }: { active: boolean }) {
-  const { discoverEgg } = useExperience();
+  const { discoverEgg, lightboxOpen } = useExperience();
   const catRef = useRef<HTMLButtonElement>(null);
   const bubbleRef = useRef<HTMLDivElement>(null);
   const [cat, setCat] = useState<CatInstance | null>(null);
   const [bubble, setBubble] = useState<Bubble | null>(null);
+  const [clickHint, setClickHint] = useState(false);
   const hideTimer = useRef<number | null>(null);
   const cycleTimer = useRef<number | null>(null);
+  const hintTimer = useRef<number | null>(null);
   const usedSpots = useRef<number[]>([]);
   const idRef = useRef(0);
   const busy = useRef(false);
@@ -109,11 +111,16 @@ export function CatSquad({ active }: { active: boolean }) {
       spotIndex: pickSpot(),
       tint: Math.random() > 0.5 ? "accent" : "gold",
     });
+    setClickHint(true);
+    if (hintTimer.current) window.clearTimeout(hintTimer.current);
+    hintTimer.current = window.setTimeout(() => setClickHint(false), 1800);
   }, [pickSpot]);
 
   const closePopupAndCat = useCallback(() => {
     if (hideTimer.current) window.clearTimeout(hideTimer.current);
     hideTimer.current = null;
+    if (hintTimer.current) window.clearTimeout(hintTimer.current);
+    setClickHint(false);
     setBubble(null);
     setCat(null);
     busy.current = false;
@@ -226,34 +233,50 @@ export function CatSquad({ active }: { active: boolean }) {
     }, 3000);
   };
 
-  if (!active) return null;
+  if (!active || lightboxOpen) return null;
   const spot = cat ? SPOTS[cat.spotIndex] : null;
 
   return (
     <>
       <AnimatePresence>
         {cat && spot && (
-          <motion.button
+          <motion.div
             key={cat.id}
-            ref={catRef}
-            type="button"
-            aria-label="Gatito escondido"
-            data-cursor="hover"
-            onClick={meow}
             initial={{ opacity: 0 }}
             exit={{ opacity: 0, scale: 0.7, y: 10 }}
             transition={{ duration: 0.3 }}
-            className={`fixed z-[46] touch-manipulation rounded-full p-2 drop-shadow-[0_8px_24px_rgba(232,180,184,0.4)] ${
-              cat.tint === "accent" ? "text-[var(--accent)]" : "text-[var(--gold)]"
-            }`}
+            className="fixed z-[46]"
             style={{
               top: spot.top,
               left: spot.left,
               right: spot.right,
             }}
           >
-            <CatSvg className="h-12 w-12 sm:h-14 sm:w-14" />
-          </motion.button>
+            <AnimatePresence>
+              {clickHint && !bubble && (
+                <motion.div
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  className="absolute bottom-full left-1/2 mb-1 -translate-x-1/2 whitespace-nowrap rounded-full bg-white/95 px-2.5 py-1 text-[10px] font-medium text-[var(--ink)] shadow-md"
+                >
+                  Dame click
+                </motion.div>
+              )}
+            </AnimatePresence>
+            <button
+              ref={catRef}
+              type="button"
+              aria-label="Gatito escondido"
+              data-cursor="hover"
+              onClick={meow}
+              className={`touch-manipulation rounded-full p-2 drop-shadow-[0_8px_24px_rgba(232,180,184,0.4)] ${
+                cat.tint === "accent" ? "text-[var(--accent)]" : "text-[var(--gold)]"
+              }`}
+            >
+              <CatSvg className="h-12 w-12 sm:h-14 sm:w-14" />
+            </button>
+          </motion.div>
         )}
       </AnimatePresence>
 

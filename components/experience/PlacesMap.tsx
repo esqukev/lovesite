@@ -5,6 +5,7 @@ import { useState } from "react";
 import { PLACES } from "@/lib/data";
 import { MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { SectionPolaroid } from "./SectionPolaroid";
 
 const MapInner = dynamic(() => import("./PlacesMapInner"), {
   ssr: false,
@@ -23,6 +24,11 @@ export function PlacesMap() {
       id="mapa"
       className="section-soft relative z-10 px-5 py-16 sm:px-8 sm:py-20"
     >
+      <SectionPolaroid
+        src="/foto8.jpeg"
+        className="right-[4%] top-24 hidden w-16 lg:block"
+        rotate="7deg"
+      />
       <div className="relative z-10 mx-auto max-w-6xl">
         <div className="mb-10 max-w-xl">
           <p className="mb-3 text-xs uppercase tracking-[0.35em] text-[var(--gold)]">

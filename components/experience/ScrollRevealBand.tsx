@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { SectionPolaroid } from "./SectionPolaroid";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -43,6 +44,16 @@ export function ScrollRevealBand() {
       ref={rootRef}
       className="section-soft relative flex min-h-[70svh] items-center justify-center overflow-hidden px-6"
     >
+      <SectionPolaroid
+        src="/foto9.jpeg"
+        className="left-[5%] top-[20%] hidden w-16 sm:block"
+        rotate="-7deg"
+      />
+      <SectionPolaroid
+        src="/foto11.jpeg"
+        className="right-[6%] bottom-[22%] hidden w-[4.5rem] md:block"
+        rotate="8deg"
+      />
       <div className="relative z-10 max-w-3xl text-center">
         <p className="font-display text-[clamp(1.8rem,5vw,3.4rem)] leading-[1.2] text-[var(--ink)]">
           {line.split(" ").map((word, i) => (

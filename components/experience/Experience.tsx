@@ -19,6 +19,7 @@ import { Footer } from "./Footer";
 import { AmbientEffects, HeartButton } from "./AmbientEffects";
 import { FloatingHearts } from "./FloatingHearts";
 import { CatSquad } from "./CatSquad";
+import { SecretFrog } from "./SecretFrog";
 import { SiteWarmth } from "./SiteWarmth";
 import { ScrollRevealBand } from "./ScrollRevealBand";
 
@@ -40,6 +41,7 @@ function ExperienceInner() {
           <AmbientEffects active={main} />
           <FloatingHearts active={main} />
           <CatSquad active={main} />
+          <SecretFrog active={main} />
 
           {phase === "gate" && (
             <Gate

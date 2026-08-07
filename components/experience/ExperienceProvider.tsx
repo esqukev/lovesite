@@ -38,6 +38,8 @@ type ExperienceContextValue = {
   setInviteAccepted: (v: boolean) => void;
   inviteOpen: boolean;
   setInviteOpen: (v: boolean) => void;
+  lightboxOpen: boolean;
+  setLightboxOpen: (v: boolean) => void;
 };
 
 const ExperienceContext = createContext<ExperienceContextValue | null>(null);
@@ -50,6 +52,7 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [inviteAccepted, setInviteAccepted] = useState(false);
   const [inviteOpen, setInviteOpen] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   const toastSeq = useRef(0);
 
   const pushToast = useCallback((title: string, detail?: string) => {
@@ -103,6 +106,8 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
       setInviteAccepted,
       inviteOpen,
       setInviteOpen,
+      lightboxOpen,
+      setLightboxOpen,
     }),
     [
       phase,
@@ -115,6 +120,7 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
       pushToast,
       inviteAccepted,
       inviteOpen,
+      lightboxOpen,
     ],
   );
 

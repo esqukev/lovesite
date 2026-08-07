@@ -5,6 +5,7 @@ import { addMonths, differenceInMonths, intervalToDuration, setYear } from "date
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { SectionPolaroid } from "./SectionPolaroid";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -116,7 +117,17 @@ export function Countdown() {
       id="countdown"
       className="section-soft relative px-5 py-20 sm:px-8 sm:py-24"
     >
-      <div className="mx-auto max-w-5xl text-center">
+      <SectionPolaroid
+        src="/foto5.jpeg"
+        className="left-[4%] top-20 hidden w-16 sm:block sm:w-[4.5rem]"
+        rotate="-6deg"
+      />
+      <SectionPolaroid
+        src="/foto16.jpeg"
+        className="right-[4%] bottom-16 hidden w-16 md:block"
+        rotate="8deg"
+      />
+      <div className="relative z-10 mx-auto max-w-5xl text-center">
         <p className="mb-3 text-xs uppercase tracking-[0.35em] text-[var(--gold)]">
           Contador
         </p>

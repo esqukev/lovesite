@@ -5,6 +5,7 @@ import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { REASONS } from "@/lib/data";
 import { useExperience } from "./ExperienceProvider";
+import { SectionPolaroid } from "./SectionPolaroid";
 
 gsap.registerPlugin(useGSAP);
 
@@ -86,7 +87,17 @@ export function Reasons() {
       id="razones"
       className="section-soft relative px-6 py-20 sm:py-24"
     >
-      <div className="mx-auto max-w-3xl text-center">
+      <SectionPolaroid
+        src="/foto4.jpeg"
+        className="left-[3%] top-24 hidden w-14 sm:block sm:w-16"
+        rotate="-9deg"
+      />
+      <SectionPolaroid
+        src="/foto13.jpeg"
+        className="right-[3%] bottom-20 hidden w-16 md:block"
+        rotate="6deg"
+      />
+      <div className="relative z-10 mx-auto max-w-3xl text-center">
         <h2
           data-cinema="title"
           className="font-display text-4xl text-[var(--ink)] sm:text-5xl"

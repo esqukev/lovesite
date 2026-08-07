@@ -9,6 +9,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { WISHLIST } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import { useExperience } from "./ExperienceProvider";
+import { SectionPolaroid } from "./SectionPolaroid";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -139,7 +140,17 @@ export function Wishlist() {
       id="cosas-por-hacer"
       className="section-soft relative px-5 py-20 sm:px-8 sm:py-24"
     >
-      <div className="mx-auto max-w-2xl">
+      <SectionPolaroid
+        src="/foto12.jpeg"
+        className="right-[3%] top-16 hidden w-16 sm:block sm:w-20"
+        rotate="-8deg"
+      />
+      <SectionPolaroid
+        src="/foto7.jpeg"
+        className="bottom-10 left-[3%] hidden w-14 md:block"
+        rotate="7deg"
+      />
+      <div className="relative z-10 mx-auto max-w-2xl">
         <div className="mb-10 text-center">
           <p className="mb-3 text-xs uppercase tracking-[0.35em] text-[var(--gold)]">
             Cosas por hacer
