@@ -32,13 +32,15 @@ body {
 }
 
 .font-display {
-  font-family: var(--font-display), Georgia, serif;
-  font-weight: 500;
-  letter-spacing: -0.02em;
+  font-family: var(--font-display), "Times New Roman", serif;
+  font-weight: 400;
+  letter-spacing: -0.025em;
 }
 
 .font-letter {
   font-family: var(--font-letter), "Segoe Script", cursive;
+  font-weight: 400;
+  letter-spacing: 0.01em;
 }
 
 .paper-texture {
@@ -390,8 +392,12 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 18% 22% 26%;
+  padding: 22% 24% 28%;
   text-align: center;
+}
+
+.heart-reason-content p {
+  text-wrap: balance;
 }
 
 .collectible-orb {

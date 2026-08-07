@@ -10,7 +10,6 @@ import { PaperLetter } from "./PaperLetter";
 import { Hero } from "./Hero";
 import { StackedMemories } from "./StackedMemories";
 import { Gallery } from "./Gallery";
-import { HorizontalFilm } from "./HorizontalFilm";
 import { PlacesMap } from "./PlacesMap";
 import { Reasons } from "./Reasons";
 import { Wishlist } from "./Wishlist";
@@ -75,7 +74,6 @@ function ExperienceInner() {
                 <main className="relative z-[3]">
                   <Hero />
                   <StackedMemories />
-                  <HorizontalFilm />
                   <Gallery />
                   <VideoMoment />
                   <PlacesMap />

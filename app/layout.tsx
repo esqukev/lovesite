@@ -1,23 +1,24 @@
 import type { Metadata } from "next";
-import { Caveat, Cormorant_Garamond, Outfit } from "next/font/google";
+import { Figtree, Gwendolyn, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 
-const display = Cormorant_Garamond({
+const display = Instrument_Serif({
   variable: "--font-display",
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: ["400"],
+  style: ["normal", "italic"],
 });
 
-const body = Outfit({
+const body = Figtree({
   variable: "--font-body",
   subsets: ["latin"],
   weight: ["300", "400", "500", "600"],
 });
 
-const letter = Caveat({
+const letter = Gwendolyn({
   variable: "--font-letter",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "700"],
 });
 
 export const metadata: Metadata = {
