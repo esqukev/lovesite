@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Figtree, Gwendolyn, Instrument_Serif } from "next/font/google";
+import { Caveat, Figtree, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 
 const display = Instrument_Serif({
@@ -15,10 +15,10 @@ const body = Figtree({
   weight: ["300", "400", "500", "600"],
 });
 
-const letter = Gwendolyn({
+const letter = Caveat({
   variable: "--font-letter",
   subsets: ["latin"],
-  weight: ["400", "700"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {

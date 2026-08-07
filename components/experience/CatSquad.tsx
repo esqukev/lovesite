@@ -240,7 +240,7 @@ export function CatSquad({ active }: { active: boolean }) {
               transition={{ type: "spring", stiffness: 240, damping: 18 }}
             >
               <div className="speech-bubble speech-bubble-pop">
-                <p className="font-letter text-lg leading-snug text-[var(--ink)]">
+                <p className="text-[15px] leading-relaxed text-[var(--ink)] sm:text-base">
                   {bubble.text}
                 </p>
                 <span

@@ -102,7 +102,7 @@ export function StackedMemories() {
               className="memory-panel absolute inset-0 flex flex-col justify-center"
               aria-hidden={i !== 0}
             >
-              <p className="mb-3 font-letter text-2xl text-[var(--accent)] sm:text-3xl">
+              <p className="mb-3 font-display text-sm italic tracking-[0.08em] text-[var(--accent)] sm:text-base">
                 {memory.date}
               </p>
               <h2 className="max-w-[14ch] font-display text-[clamp(2.4rem,7vw,4.5rem)] leading-[0.95] text-[var(--cream)]">

@@ -72,9 +72,9 @@ export function PaperLetter({ onStart }: { onStart: () => void }) {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(232,180,184,0.14),transparent_45%)]" />
 
       <div className="paper-shell relative w-full max-w-lg" style={{ transformStyle: "preserve-3d" }}>
-        <p className="mb-5 text-center text-[10px] uppercase tracking-[0.35em] text-[var(--gold)]">
-          Una carta para ti
-        </p>
+        <h2 className="mb-6 text-center font-display text-[clamp(1.85rem,5vw,2.6rem)] italic leading-tight tracking-[-0.02em] text-[var(--cream)]">
+          Una carta para mi amor
+        </h2>
 
         {!open && (
           <button
@@ -103,10 +103,10 @@ export function PaperLetter({ onStart }: { onStart: () => void }) {
         >
           <div className="paper-texture relative rounded-sm px-7 py-9 sm:px-10 sm:py-11">
             <div className="absolute left-0 top-0 h-full w-2 bg-gradient-to-r from-black/10 to-transparent" />
-            <p className="font-letter text-[1.15rem] leading-relaxed text-[#3a2a22] whitespace-pre-wrap sm:text-[1.25rem]">
+            <p className="font-display text-[1.2rem] leading-[1.75] text-[#2c211c] whitespace-pre-wrap sm:text-[1.35rem]">
               {displayed}
               {open && !done && (
-                <span className="ml-0.5 inline-block h-4 w-[2px] animate-pulse bg-[#3a2a22]/50" />
+                <span className="ml-0.5 inline-block h-4 w-[2px] animate-pulse bg-[#2c211c]/50" />
               )}
             </p>
 
@@ -121,13 +121,8 @@ export function PaperLetter({ onStart }: { onStart: () => void }) {
                 className="letter-seal-btn group relative touch-manipulation"
               >
                 <span className="letter-seal-glow" aria-hidden />
-                <span className="relative z-[1] flex flex-col items-center px-8 py-4">
-                  <span className="font-display text-lg tracking-wide text-[#f7efe6] sm:text-xl">
-                    Comenzar nuestro recorrido
-                  </span>
-                  <span className="mt-1 text-[10px] uppercase tracking-[0.28em] text-[#f7efe6]/65">
-                    Abre el universo
-                  </span>
+                <span className="relative z-[1] px-10 py-3.5 font-display text-xl tracking-wide text-[#f7efe6]">
+                  Entrar
                 </span>
               </button>
             </div>

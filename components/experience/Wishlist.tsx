@@ -134,7 +134,7 @@ export function Wishlist() {
             Márcalo cuando lo vivamos. Tú también puedes escribir lo tuyo —
             se guarda aquí.
           </p>
-          <p className="mt-5 font-letter text-xl text-[var(--accent)]/80">
+          <p className="mt-5 font-display text-lg italic text-[var(--accent)]/80">
             {doneCount} de {items.length}
           </p>
         </div>
@@ -203,7 +203,7 @@ export function Wishlist() {
                     </span>
                   </span>
                   {item.custom && (
-                    <span className="shrink-0 font-letter text-base text-[var(--gold)]">
+                    <span className="shrink-0 font-display text-sm italic text-[var(--gold)]">
                       Motzy
                     </span>
                   )}
@@ -224,7 +224,7 @@ export function Wishlist() {
         </ul>
 
         {allDone && (
-          <p className="mt-10 text-center font-letter text-2xl text-[var(--accent)]">
+          <p className="mt-10 text-center font-display text-xl italic text-[var(--accent)]">
             Lo vivimos todo… y aún quiero inventar más contigo.
           </p>
         )}

@@ -17,7 +17,6 @@ import { Countdown } from "./Countdown";
 import { Invitation } from "./Invitation";
 import { Footer } from "./Footer";
 import { AmbientEffects, HeartButton } from "./AmbientEffects";
-import { VideoMoment } from "./VideoMoment";
 import { FloatingHearts } from "./FloatingHearts";
 import { CatSquad } from "./CatSquad";
 import { ThreadPath } from "./ThreadPath";
@@ -75,7 +74,6 @@ function ExperienceInner() {
                   <Hero />
                   <StackedMemories />
                   <Gallery />
-                  <VideoMoment />
                   <PlacesMap />
                   <Reasons />
                   <Wishlist />

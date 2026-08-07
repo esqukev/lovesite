@@ -162,7 +162,7 @@ export function Reasons() {
             <div className="heart-reason-content">
               <p
                 ref={textRef}
-                className="font-letter text-[1.35rem] leading-[1.25] text-[var(--ink)] sm:text-[1.65rem]"
+                className="font-display text-[1.05rem] leading-snug text-[var(--ink)] sm:text-[1.2rem]"
               >
                 {REASONS[index]}
               </p>
