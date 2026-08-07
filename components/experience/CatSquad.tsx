@@ -12,7 +12,7 @@ const CAT_LINES = [
   "¿ya le dijiste que la amas hoy?",
   "misión: hacerla sonreír ✓",
   "si esto fuera un juego, ella sería el final bueno",
-  "tip: toca las estrellitas para ganar XP",
+  "arrastra las fotos… se sienten vivas",
 ];
 
 function CatSvg({ className }: { className?: string }) {
@@ -45,26 +45,36 @@ function CatSvg({ className }: { className?: string }) {
 
 type Bubble = {
   text: string;
-  x: number;
-  y: number;
+  left: number;
+  top: number;
   side: "left" | "right";
 };
+
+function clampBubble(side: "left" | "right", catRect: DOMRect): Omit<Bubble, "text" | "side"> {
+  const width = Math.min(window.innerWidth * 0.86, 280);
+  const margin = 12;
+  let left: number;
+  let top = catRect.top - 12;
+
+  if (side === "right") {
+    // Anchor to the left of the right cat so it never clips
+    left = catRect.left - width - 8;
+  } else {
+    left = catRect.left + catRect.width / 2 - width / 2;
+  }
+
+  left = Math.max(margin, Math.min(left, window.innerWidth - width - margin));
+  top = Math.max(margin + 40, Math.min(top, window.innerHeight - 160));
+
+  return { left, top };
+}
 
 export function CatSquad({ active }: { active: boolean }) {
   const { discoverEgg } = useExperience();
   const catA = useRef<HTMLButtonElement>(null);
   const catB = useRef<HTMLButtonElement>(null);
   const [bubble, setBubble] = useState<Bubble | null>(null);
-  const [isMobile, setIsMobile] = useState(false);
   const hideTimer = useRef<number | null>(null);
-
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 640px)");
-    const sync = () => setIsMobile(mq.matches);
-    sync();
-    mq.addEventListener("change", sync);
-    return () => mq.removeEventListener("change", sync);
-  }, []);
 
   useEffect(() => {
     if (!active) return;
@@ -73,7 +83,8 @@ export function CatSquad({ active }: { active: boolean }) {
     if (!a || !b) return;
 
     const mm = window.matchMedia("(max-width: 640px)");
-    const walkX = () => (mm.matches ? window.innerWidth * 0.42 : window.innerWidth * 0.55);
+    const walkX = () =>
+      mm.matches ? window.innerWidth * 0.35 : window.innerWidth * 0.5;
 
     const tl = gsap.timeline({ repeat: -1 });
     tl.to(a, { x: walkX, duration: 12, ease: "sine.inOut" })
@@ -109,11 +120,11 @@ export function CatSquad({ active }: { active: boolean }) {
       detail: "Te dejó un mensaje ♥",
     });
     const rect = el.getBoundingClientRect();
+    const pos = clampBubble(side, rect);
     if (hideTimer.current) window.clearTimeout(hideTimer.current);
     setBubble({
       text: CAT_LINES[Math.floor(Math.random() * CAT_LINES.length)],
-      x: rect.left + rect.width / 2,
-      y: rect.top,
+      ...pos,
       side,
     });
     gsap.fromTo(
@@ -121,7 +132,6 @@ export function CatSquad({ active }: { active: boolean }) {
       { scale: 1 },
       { scale: 1.22, duration: 0.16, yoyo: true, repeat: 1 },
     );
-    // Long enough to read comfortably on mobile
     hideTimer.current = window.setTimeout(() => setBubble(null), 12000);
   };
 
@@ -153,40 +163,34 @@ export function CatSquad({ active }: { active: boolean }) {
 
       <AnimatePresence>
         {bubble && (
-          <motion.div
-            key={bubble.text + bubble.x}
-            initial={{ opacity: 0, y: 22, scale: 0.7, rotate: -4 }}
-            animate={{ opacity: 1, y: 0, scale: 1, rotate: 0 }}
-            exit={{ opacity: 0, y: -14, scale: 0.9 }}
-            transition={{ type: "spring", stiffness: 240, damping: 16 }}
-            className="pointer-events-none fixed z-[80] w-[min(86vw,280px)]"
-            style={
-              isMobile
-                ? { left: "50%", top: "18%", transform: "translateX(-50%)" }
-                : {
-                    left: bubble.x,
-                    top: bubble.y,
-                    transform: "translate(-50%, -118%)",
-                  }
-            }
+          <div
+            className="pointer-events-none fixed z-[80] w-[min(86vw,280px)] -translate-y-full"
+            style={{ left: bubble.left, top: bubble.top }}
           >
-            <div className="speech-bubble speech-bubble-pop">
-              <div className="mb-1 flex items-center justify-between gap-2">
-                <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--ink)]/45">
-                  Gatito dice
-                </span>
-                <span className="text-[10px] text-[var(--ink)]/35">12s</span>
+            <motion.div
+              key={bubble.text + bubble.left}
+              initial={{ opacity: 0, y: 14, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -8, scale: 0.94 }}
+              transition={{ type: "spring", stiffness: 240, damping: 18 }}
+            >
+              <div className="speech-bubble speech-bubble-pop">
+                <div className="mb-1">
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--ink)]/45">
+                    Gatito dice
+                  </span>
+                </div>
+                <p className="text-[15px] leading-relaxed text-[var(--ink)] sm:text-base">
+                  {bubble.text}
+                </p>
+                <span
+                  className={`speech-tail ${
+                    bubble.side === "right" ? "speech-tail-right" : ""
+                  }`}
+                />
               </div>
-              <p className="text-[15px] leading-relaxed text-[var(--ink)] sm:text-base">
-                {bubble.text}
-              </p>
-              <span className="speech-pop-dot speech-pop-dot-a" />
-              <span className="speech-pop-dot speech-pop-dot-b" />
-              <span
-                className={`speech-tail ${bubble.side === "right" ? "speech-tail-right" : ""} ${isMobile ? "hidden" : ""}`}
-              />
-            </div>
-          </motion.div>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </>

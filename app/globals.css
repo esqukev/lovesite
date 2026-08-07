@@ -343,7 +343,8 @@ body {
 }
 
 .speech-tail-right {
-  left: 70%;
+  left: auto;
+  right: 18%;
 }
 
 .speech-bubble-pop {
