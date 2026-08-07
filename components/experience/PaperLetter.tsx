@@ -129,9 +129,6 @@ export function PaperLetter({ onStart }: { onStart: () => void }) {
                     Abre el universo
                   </span>
                 </span>
-                <span className="letter-seal-heart" aria-hidden>
-                  ♥
-                </span>
               </button>
             </div>
           </div>

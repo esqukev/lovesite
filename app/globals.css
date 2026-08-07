@@ -95,22 +95,6 @@ body {
   transform: translateX(60%);
 }
 
-.letter-seal-heart {
-  position: absolute;
-  right: 14px;
-  top: 50%;
-  translate: 0 -50%;
-  display: grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 999px;
-  background: rgba(247, 239, 230, 0.18);
-  color: #f7efe6;
-  font-size: 14px;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
-}
-
 .frost-flake {
   position: absolute;
   border-radius: 999px;
