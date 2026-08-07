@@ -6,13 +6,13 @@ import { gsap } from "gsap";
 import { useExperience } from "./ExperienceProvider";
 
 const CAT_LINES = [
+  "Te amo.",
+  "Eres mi gordi",
+  "Motzy motz",
+  "Quiero pijama real",
+  "Vamos por un cafecito",
   "miau… ella es tu persona favorita",
-  "este gatito aprueba esta relación",
   "¿ya le dijiste que la amas hoy?",
-  "si esto fuera un juego, ella sería el final bueno",
-  "arrastra las fotos… se sienten vivas",
-  "shh… no le digas a nadie que estoy aquí",
-  "solo aparezco cuando nadie me busca",
 ];
 
 type Spot = { top: string; left?: string; right?: string; side: "left" | "right" };
@@ -90,12 +90,15 @@ type CatInstance = {
 export function CatSquad({ active }: { active: boolean }) {
   const { discoverEgg } = useExperience();
   const catRef = useRef<HTMLButtonElement>(null);
+  const bubbleRef = useRef<HTMLDivElement>(null);
   const [cat, setCat] = useState<CatInstance | null>(null);
   const [bubble, setBubble] = useState<Bubble | null>(null);
   const hideTimer = useRef<number | null>(null);
   const cycleTimer = useRef<number | null>(null);
   const usedSpots = useRef<number[]>([]);
   const idRef = useRef(0);
+  const paused = useRef(false);
+  const bubbleOpen = useRef(false);
 
   const pickSpot = useCallback(() => {
     const available = SPOTS.map((_, i) => i).filter(
@@ -110,6 +113,7 @@ export function CatSquad({ active }: { active: boolean }) {
   const spawn = useCallback(() => {
     idRef.current += 1;
     setBubble(null);
+    bubbleOpen.current = false;
     setCat({
       id: idRef.current,
       spotIndex: pickSpot(),
@@ -117,36 +121,51 @@ export function CatSquad({ active }: { active: boolean }) {
     });
   }, [pickSpot]);
 
+  const dismissAll = useCallback(() => {
+    if (hideTimer.current) window.clearTimeout(hideTimer.current);
+    setBubble(null);
+    bubbleOpen.current = false;
+    setCat(null);
+    paused.current = false;
+  }, []);
+
   useEffect(() => {
     if (!active) {
-      setCat(null);
-      setBubble(null);
+      dismissAll();
       return;
     }
 
-    const first = window.setTimeout(spawn, 2800);
+    let cancelled = false;
 
-    const loop = () => {
-      const visibleMs = 5500 + Math.random() * 4500;
-      const gapMs = 2200 + Math.random() * 4000;
+    const scheduleNext = (delay: number) => {
+      if (cycleTimer.current) window.clearTimeout(cycleTimer.current);
       cycleTimer.current = window.setTimeout(() => {
+        if (cancelled || paused.current || bubbleOpen.current) {
+          scheduleNext(800);
+          return;
+        }
         setCat(null);
         setBubble(null);
         cycleTimer.current = window.setTimeout(() => {
+          if (cancelled) return;
           spawn();
-          loop();
-        }, gapMs);
-      }, visibleMs);
+          scheduleNext(5500 + Math.random() * 4500);
+        }, 2200 + Math.random() * 2500);
+      }, delay);
     };
 
-    cycleTimer.current = window.setTimeout(loop, 2800);
+    const first = window.setTimeout(() => {
+      spawn();
+      scheduleNext(5500 + Math.random() * 4500);
+    }, 2800);
 
     return () => {
+      cancelled = true;
       window.clearTimeout(first);
       if (cycleTimer.current) window.clearTimeout(cycleTimer.current);
       if (hideTimer.current) window.clearTimeout(hideTimer.current);
     };
-  }, [active, spawn]);
+  }, [active, spawn, dismissAll]);
 
   useEffect(() => {
     const el = catRef.current;
@@ -170,6 +189,18 @@ export function CatSquad({ active }: { active: boolean }) {
     };
   }, [cat]);
 
+  useEffect(() => {
+    if (!bubble) return;
+    const onPointerDown = (e: PointerEvent) => {
+      const t = e.target as Node;
+      if (catRef.current?.contains(t)) return;
+      if (bubbleRef.current?.contains(t)) return;
+      dismissAll();
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => document.removeEventListener("pointerdown", onPointerDown);
+  }, [bubble, dismissAll]);
+
   const meow = () => {
     const el = catRef.current;
     if (!el || !cat) return;
@@ -181,6 +212,8 @@ export function CatSquad({ active }: { active: boolean }) {
     const rect = el.getBoundingClientRect();
     const pos = clampBubble(spot.side, rect);
     if (hideTimer.current) window.clearTimeout(hideTimer.current);
+    paused.current = true;
+    bubbleOpen.current = true;
     setBubble({
       text: CAT_LINES[Math.floor(Math.random() * CAT_LINES.length)],
       ...pos,
@@ -189,9 +222,13 @@ export function CatSquad({ active }: { active: boolean }) {
     gsap.fromTo(
       el,
       { scale: 1 },
-      { scale: 1.2, duration: 0.15, yoyo: true, repeat: 1 },
+      { scale: 1.18, duration: 0.15, yoyo: true, repeat: 1 },
     );
-    hideTimer.current = window.setTimeout(() => setBubble(null), 10000);
+    hideTimer.current = window.setTimeout(() => {
+      setBubble(null);
+      bubbleOpen.current = false;
+      paused.current = false;
+    }, 3000);
   };
 
   if (!active) return null;
@@ -208,7 +245,10 @@ export function CatSquad({ active }: { active: boolean }) {
             type="button"
             aria-label="Gatito escondido"
             data-cursor="hover"
-            onClick={meow}
+            onClick={(e) => {
+              e.stopPropagation();
+              meow();
+            }}
             initial={{ opacity: 0 }}
             exit={{ opacity: 0, scale: 0.6, y: 12 }}
             transition={{ duration: 0.35 }}
@@ -229,8 +269,10 @@ export function CatSquad({ active }: { active: boolean }) {
       <AnimatePresence>
         {bubble && (
           <div
-            className="pointer-events-none fixed z-[80] w-[min(86vw,280px)] -translate-y-full"
+            ref={bubbleRef}
+            className="fixed z-[80] w-[min(86vw,280px)] -translate-y-full"
             style={{ left: bubble.left, top: bubble.top }}
+            onClick={(e) => e.stopPropagation()}
           >
             <motion.div
               key={bubble.text + bubble.left}

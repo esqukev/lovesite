@@ -50,29 +50,30 @@ export function Loader({ onDone }: { onDone: () => void }) {
   return (
     <div
       ref={rootRef}
-      className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#0f0c0b] px-6"
+      className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#f3e8ea] px-6"
     >
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(232,170,176,0.35),transparent_55%)]" />
       <svg
         viewBox="0 0 320 120"
-        className="mb-8 h-24 w-[min(80vw,320px)]"
+        className="relative mb-8 h-24 w-[min(80vw,320px)]"
         fill="none"
         aria-hidden
       >
         <path
           className="loader-path"
           d="M20 70 C60 20, 100 110, 160 55 S260 20, 300 65"
-          stroke="#e8b4b8"
+          stroke="#c86b78"
           strokeWidth="3"
           strokeLinecap="round"
         />
       </svg>
-      <p className="overflow-hidden font-display text-4xl text-[#f3ebe3] sm:text-5xl">
+      <p className="relative overflow-hidden font-display text-4xl text-[var(--ink)] sm:text-5xl">
         <span className="loader-word inline-block">Nuestro</span>{" "}
         <span className="loader-word inline-block text-[var(--accent)]">
           universo
         </span>
       </p>
-      <p className="loader-word mt-3 text-[10px] uppercase tracking-[0.4em] text-white/35">
+      <p className="loader-word relative mt-3 text-[10px] uppercase tracking-[0.4em] text-[var(--ink)]/40">
         Cargando pedacitos
       </p>
     </div>

@@ -32,8 +32,7 @@ export function PlacesMap() {
             Nuestro mapa
           </h2>
           <p className="muted mt-4">
-            Cada punto ya muestra su nombre. Toca uno para leer el recuerdo —
-            y toca el mapa vacío para volver a verlo completo.
+            Cada punto tiene su descripción. Dale click para leerla.
           </p>
         </div>
 

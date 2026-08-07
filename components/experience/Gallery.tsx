@@ -31,39 +31,11 @@ export function Gallery() {
   const { discoverEgg } = useExperience();
   const spots = useRef(buildSpots(GALLERY_IMAGES.length)).current;
   const dragMoved = useRef(false);
-  const dragging = useRef(false);
 
   useEffect(() => {
     const board = boardRef.current;
     if (!board) return;
     const cards = gsap.utils.toArray<HTMLElement>(".polaroid", board);
-    const setters = cards.map((card) =>
-      gsap.quickTo(card, "scale", { duration: 0.35, ease: "power3.out" }),
-    );
-
-    const radius = 240;
-    const mapScale = gsap.utils.mapRange(0, radius, 1.38, 1);
-
-    const onMove = (e: PointerEvent) => {
-      if (dragging.current || active !== null) return;
-      cards.forEach((card, i) => {
-        const r = card.getBoundingClientRect();
-        const cx = r.left + r.width / 2;
-        const cy = r.top + r.height / 2;
-        const dist = Math.hypot(e.clientX - cx, e.clientY - cy);
-        const scale = mapScale(gsap.utils.clamp(0, radius, dist));
-        setters[i](scale);
-        card.style.zIndex = String(Math.round((1.38 - scale) * -100 + spots[i].z));
-      });
-    };
-
-    const onLeave = () => {
-      if (dragging.current) return;
-      setters.forEach((set) => set(1));
-    };
-
-    board.addEventListener("pointermove", onMove);
-    board.addEventListener("pointerleave", onLeave);
 
     const draggables = Draggable.create(cards, {
       bounds: board,
@@ -72,18 +44,15 @@ export function Gallery() {
       inertia: true,
       onPress() {
         dragMoved.current = false;
-        dragging.current = true;
-        gsap.to(this.target, { scale: 1.12, duration: 0.2, zIndex: 50 });
+        gsap.to(this.target, { scale: 1.1, duration: 0.22, zIndex: 50 });
       },
       onDrag() {
         dragMoved.current = true;
       },
       onRelease() {
-        dragging.current = false;
-        gsap.to(this.target, { scale: 1, duration: 0.25 });
+        gsap.to(this.target, { scale: 1, duration: 0.28, ease: "power2.out" });
       },
       onDragEnd() {
-        dragging.current = false;
         discoverEgg("photo-particles", {
           title: "Foto movida",
           detail: "Estás jugando con nuestros recuerdos",
@@ -92,11 +61,9 @@ export function Gallery() {
     });
 
     return () => {
-      board.removeEventListener("pointermove", onMove);
-      board.removeEventListener("pointerleave", onLeave);
       draggables.forEach((d) => d.kill());
     };
-  }, [discoverEgg, active, spots]);
+  }, [discoverEgg]);
 
   const openPhoto = (index: number, el: HTMLElement) => {
     if (dragMoved.current) return;
@@ -123,7 +90,7 @@ export function Gallery() {
           Arrástralas
         </h2>
         <p className="muted mt-3">
-          Acerca el cursor — crecen cerca de ti. Muévelas. Ábrelas.
+          Pasa el mouse para agrandarlas. Muévelas. Ábrelas.
         </p>
       </div>
 
@@ -137,7 +104,7 @@ export function Gallery() {
             <button
               key={img.src + index}
               type="button"
-              className="polaroid absolute w-[42%] max-w-[180px] origin-center cursor-grab touch-manipulation will-change-transform active:cursor-grabbing sm:w-[22%] sm:max-w-[200px]"
+              className="polaroid absolute w-[42%] max-w-[180px] origin-center cursor-grab touch-manipulation will-change-transform transition-transform duration-300 ease-out hover:z-40 hover:scale-110 active:cursor-grabbing sm:w-[22%] sm:max-w-[200px]"
               style={{
                 left: `${spot.x}%`,
                 top: `${spot.y}%`,

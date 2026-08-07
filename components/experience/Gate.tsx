@@ -92,13 +92,13 @@ export function Gate({ onUnlock }: { onUnlock: () => void }) {
   return (
     <div
       ref={rootRef}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black px-6"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[#f3e8ea] px-6"
     >
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(232,180,184,0.08),transparent_55%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(232,170,176,0.4),transparent_55%),radial-gradient(ellipse_at_bottom,rgba(255,214,188,0.35),transparent_50%)]" />
       <div className="relative mx-auto max-w-xl text-center">
         {status === "idle" || status === "ok" ? (
           <>
-            <p className="gate-line font-display text-2xl leading-relaxed text-[#f3ebe3] sm:text-3xl md:text-4xl">
+            <p className="gate-line font-display text-2xl leading-relaxed text-[var(--ink)] sm:text-3xl md:text-4xl">
               Existe un pequeño lugar al que solamente dos personas tienen
               acceso.
             </p>
@@ -116,7 +116,7 @@ export function Gate({ onUnlock }: { onUnlock: () => void }) {
                   setError(false);
                 }}
                 placeholder="Ingresa tu identidad"
-                className="w-full max-w-sm rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 text-center text-[#f3ebe3] outline-none backdrop-blur-sm placeholder:text-white/30 focus:border-[var(--accent)]/50 focus:bg-white/[0.05] transition-colors"
+                className="w-full max-w-sm rounded-2xl border border-[var(--ink)]/15 bg-white/60 px-5 py-4 text-center text-[var(--ink)] outline-none backdrop-blur-sm placeholder:text-[var(--ink)]/35 focus:border-[var(--accent)] focus:bg-white/80 transition-colors"
               />
               {error && (
                 <p className="text-sm text-[var(--accent)]">
@@ -129,10 +129,10 @@ export function Gate({ onUnlock }: { onUnlock: () => void }) {
 
         {status !== "idle" && (
           <div className="gate-confirm space-y-4 opacity-0">
-            <p className="font-display text-2xl text-[#f3ebe3] sm:text-3xl">
+            <p className="font-display text-2xl text-[var(--ink)] sm:text-3xl">
               Identidad confirmada...
             </p>
-            <p className="text-lg text-white/70">
+            <p className="text-lg text-[var(--ink)]/65">
               Bienvenida a nuestro pequeño universo.
             </p>
           </div>

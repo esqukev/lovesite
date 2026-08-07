@@ -20,6 +20,8 @@ import { AmbientEffects, HeartButton } from "./AmbientEffects";
 import { FloatingHearts } from "./FloatingHearts";
 import { CatSquad } from "./CatSquad";
 import { ThreadPath } from "./ThreadPath";
+import { SiteWarmth } from "./SiteWarmth";
+import { ScrollRevealBand } from "./ScrollRevealBand";
 
 function ExperienceInner() {
   const { phase, setPhase } = useExperience();
@@ -62,6 +64,7 @@ function ExperienceInner() {
             <SmoothScroll enabled>
               <div className="experience-root relative min-h-screen overflow-x-hidden">
                 <ThreadPath />
+                <SiteWarmth />
 
                 <header className="fixed left-0 right-0 top-0 z-40 flex items-center justify-between px-5 py-5">
                   <div className="font-display text-lg tracking-wide text-[var(--ink)]/80">
@@ -74,6 +77,7 @@ function ExperienceInner() {
                   <Hero />
                   <StackedMemories />
                   <Gallery />
+                  <ScrollRevealBand />
                   <PlacesMap />
                   <Reasons />
                   <Wishlist />

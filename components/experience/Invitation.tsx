@@ -57,6 +57,7 @@ export function Invitation({ active }: { active: boolean }) {
       colors: ["#e8b4b8", "#f3ebe3", "#ffffff", "#c4a574"],
       scalar: 0.85,
     });
+    window.open("https://wa.link/o7fbh3", "_blank", "noopener,noreferrer");
   };
 
   const dodge = () => {

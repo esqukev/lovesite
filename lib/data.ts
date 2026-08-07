@@ -152,14 +152,14 @@ export const REASONS = [
 ];
 
 export const WISHLIST = [
-  { id: "viajar", label: "Un viaje solo de nosotros dos" },
-  { id: "picnic", label: "Picnic sin prisa, sin celular" },
-  { id: "cerro", label: "Subir al Cerro Pelado" },
-  { id: "playa", label: "Días enteros de playa" },
-  { id: "acampar", label: "Acampar bajo las estrellas" },
-  { id: "fotos", label: "Una sesión de fotos juntos" },
-  { id: "fit", label: "Entrenar hasta vernos en forma" },
-  { id: "lugares", label: "Perdernos en un pueblo nuevo" },
+  { id: "viajar", label: "Viajar" },
+  { id: "picnic", label: "Picnic" },
+  { id: "cerro", label: "Cerro Pelado" },
+  { id: "playa", label: "Ir a la playa" },
+  { id: "acampar", label: "Acampar" },
+  { id: "fotos", label: "Tomarnos más fotos" },
+  { id: "fit", label: "Ser más fit juntos" },
+  { id: "lugares", label: "Conocer más lugares" },
 ];
 
 export const HIDDEN_PHRASES = [
