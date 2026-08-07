@@ -30,15 +30,28 @@ export function Reasons() {
     if (el) {
       gsap.fromTo(
         el,
-        { ...anim, opacity: 0.2 },
-        { x: 0, y: 0, rotate: 0, scale: 1, opacity: 1, duration: 0.65, ease: "back.out(1.6)" },
+        { ...anim, opacity: 0.25 },
+        {
+          x: 0,
+          y: 0,
+          rotate: 0,
+          scale: 1,
+          opacity: 1,
+          duration: 0.65,
+          ease: "back.out(1.6)",
+        },
       );
     }
     const nextIndex = (index + 1) % REASONS.length;
     setIndex(nextIndex);
     const count = revealed + 1;
     setRevealed(count);
-    if (count >= REASONS.length) discoverEgg("all-reasons");
+    if (count >= REASONS.length) {
+      discoverEgg("all-reasons", {
+        title: "Corazón completo",
+        detail: "Descubriste todas las razones",
+      });
+    }
   };
 
   return (
@@ -47,7 +60,10 @@ export function Reasons() {
         <p className="mb-3 text-xs uppercase tracking-[0.35em] text-[var(--gold)]">
           Pequeñas cosas
         </p>
-        <h2 data-cinema="title" className="font-display text-4xl text-[var(--cream)] sm:text-5xl">
+        <h2
+          data-cinema="title"
+          className="font-display text-4xl text-[var(--cream)] sm:text-5xl"
+        >
           Cosas que amo de ti
         </h2>
         <p className="mx-auto mt-4 max-w-lg text-white/55">
@@ -55,23 +71,61 @@ export function Reasons() {
           siempre hay más.
         </p>
 
-        <button
-          ref={cardRef}
-          type="button"
-          data-cursor="hover"
-          onClick={next}
-          className="group relative mx-auto mt-14 flex min-h-[240px] w-full max-w-xl flex-col items-center justify-center overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-white/[0.07] to-white/[0.02] px-8 py-12 text-center shadow-[0_30px_80px_-40px_rgba(232,180,184,0.35)] backdrop-blur-xl transition-shadow hover:shadow-[0_40px_100px_-40px_rgba(232,180,184,0.55)]"
-        >
-          <span className="mb-4 text-[10px] uppercase tracking-[0.35em] text-white/35">
-            Toca para revelar
-          </span>
-          <p className="font-display text-2xl leading-snug text-[var(--cream)] sm:text-3xl">
-            {REASONS[index]}
-          </p>
-          <span className="mt-8 text-xs text-white/30">
-            {Math.min(revealed + 1, REASONS.length)} / {REASONS.length}
-          </span>
-        </button>
+        <div className="relative mx-auto mt-10 flex justify-center">
+          <button
+            ref={cardRef}
+            type="button"
+            data-cursor="hover"
+            onClick={next}
+            aria-label="Revelar razón"
+            className="heart-reason group relative touch-manipulation"
+          >
+            <svg
+              className="heart-reason-svg"
+              viewBox="0 0 200 180"
+              aria-hidden
+            >
+              <defs>
+                <linearGradient id="heartFill" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#f0c4c7" />
+                  <stop offset="45%" stopColor="#e8b4b8" />
+                  <stop offset="100%" stopColor="#c98a92" />
+                </linearGradient>
+                <filter id="heartGlow" x="-30%" y="-30%" width="160%" height="160%">
+                  <feGaussianBlur stdDeviation="6" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+              </defs>
+              <path
+                d="M100 162C28 112 18 58 62 34c22-12 38-4 38 12 0-16 16-24 38-12 44 24 34 78-38 128z"
+                fill="url(#heartFill)"
+                filter="url(#heartGlow)"
+                className="transition-transform duration-500 group-hover:scale-[1.02]"
+              />
+              <path
+                d="M100 162C28 112 18 58 62 34c22-12 38-4 38 12 0-16 16-24 38-12 44 24 34 78-38 128z"
+                fill="none"
+                stroke="rgba(255,255,255,0.35)"
+                strokeWidth="1.5"
+              />
+            </svg>
+
+            <div className="heart-reason-content">
+              <span className="mb-2 block text-[10px] uppercase tracking-[0.28em] text-[var(--ink)]/55">
+                Toca el corazón
+              </span>
+              <p className="font-display text-lg leading-snug text-[var(--ink)] sm:text-xl">
+                {REASONS[index]}
+              </p>
+              <span className="mt-3 block text-[11px] text-[var(--ink)]/45">
+                {Math.min(revealed + 1, REASONS.length)} / {REASONS.length}
+              </span>
+            </div>
+          </button>
+        </div>
       </div>
     </section>
   );

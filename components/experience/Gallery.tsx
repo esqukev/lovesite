@@ -142,16 +142,16 @@ export function Gallery() {
           </p>
         </div>
 
-        <div className="columns-1 gap-4 sm:columns-2 lg:columns-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {GALLERY_IMAGES.map((img, index) => (
             <div
               key={img.src + index}
-              className={`gallery-item mb-4 break-inside-avoid ${
+              className={`gallery-item ${
                 img.span === "tall"
-                  ? "h-[420px]"
+                  ? "h-[380px] sm:row-span-2 sm:h-auto sm:min-h-[500px]"
                   : img.span === "wide"
-                    ? "h-[280px]"
-                    : "h-[320px]"
+                    ? "h-[280px] sm:col-span-2 lg:col-span-1 lg:h-[320px]"
+                    : "h-[300px]"
               }`}
             >
               <TiltImage
@@ -186,21 +186,26 @@ export function Gallery() {
               <X size={18} />
             </button>
             <motion.div
-              className="relative h-[70vh] w-full max-w-4xl overflow-hidden rounded-3xl"
+              className="relative flex h-[78vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl"
               initial={{ scale: 0.88, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.92, opacity: 0 }}
               transition={{ type: "spring", stiffness: 180, damping: 22 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <Image
-                src={GALLERY_IMAGES[active].src}
-                alt={GALLERY_IMAGES[active].alt}
-                fill
-                className="object-contain"
-                sizes="100vw"
-                priority
-              />
+              <div className="relative min-h-0 flex-1">
+                <Image
+                  src={GALLERY_IMAGES[active].src}
+                  alt={GALLERY_IMAGES[active].alt}
+                  fill
+                  className="object-contain"
+                  sizes="100vw"
+                  priority
+                />
+              </div>
+              <p className="shrink-0 bg-black/70 px-4 py-3 text-center font-display text-lg text-[var(--cream)] backdrop-blur-md">
+                {GALLERY_IMAGES[active].alt}
+              </p>
             </motion.div>
           </motion.div>
         )}

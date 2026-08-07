@@ -55,7 +55,16 @@ export function CatSquad({ active }: { active: boolean }) {
   const catA = useRef<HTMLButtonElement>(null);
   const catB = useRef<HTMLButtonElement>(null);
   const [bubble, setBubble] = useState<Bubble | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
   const hideTimer = useRef<number | null>(null);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 640px)");
+    const sync = () => setIsMobile(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
 
   useEffect(() => {
     if (!active) return;
@@ -112,8 +121,8 @@ export function CatSquad({ active }: { active: boolean }) {
       { scale: 1 },
       { scale: 1.22, duration: 0.16, yoyo: true, repeat: 1 },
     );
-    // Enough time to actually read on mobile
-    hideTimer.current = window.setTimeout(() => setBubble(null), 7500);
+    // Long enough to read comfortably on mobile
+    hideTimer.current = window.setTimeout(() => setBubble(null), 12000);
   };
 
   if (!active) return null;
@@ -146,19 +155,35 @@ export function CatSquad({ active }: { active: boolean }) {
         {bubble && (
           <motion.div
             key={bubble.text + bubble.x}
-            initial={{ opacity: 0, y: 16, scale: 0.86 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.94 }}
-            transition={{ type: "spring", stiffness: 260, damping: 18 }}
-            className="pointer-events-none fixed z-[80] w-[min(78vw,260px)] -translate-x-1/2 -translate-y-[110%]"
-            style={{ left: bubble.x, top: bubble.y }}
+            initial={{ opacity: 0, y: 22, scale: 0.7, rotate: -4 }}
+            animate={{ opacity: 1, y: 0, scale: 1, rotate: 0 }}
+            exit={{ opacity: 0, y: -14, scale: 0.9 }}
+            transition={{ type: "spring", stiffness: 240, damping: 16 }}
+            className="pointer-events-none fixed z-[80] w-[min(86vw,280px)]"
+            style={
+              isMobile
+                ? { left: "50%", top: "18%", transform: "translateX(-50%)" }
+                : {
+                    left: bubble.x,
+                    top: bubble.y,
+                    transform: "translate(-50%, -118%)",
+                  }
+            }
           >
-            <div className="speech-bubble">
-              <p className="text-sm leading-relaxed text-[var(--ink)] sm:text-[15px]">
+            <div className="speech-bubble speech-bubble-pop">
+              <div className="mb-1 flex items-center justify-between gap-2">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--ink)]/45">
+                  Gatito dice
+                </span>
+                <span className="text-[10px] text-[var(--ink)]/35">12s</span>
+              </div>
+              <p className="text-[15px] leading-relaxed text-[var(--ink)] sm:text-base">
                 {bubble.text}
               </p>
+              <span className="speech-pop-dot speech-pop-dot-a" />
+              <span className="speech-pop-dot speech-pop-dot-b" />
               <span
-                className={`speech-tail ${bubble.side === "right" ? "speech-tail-right" : ""}`}
+                className={`speech-tail ${bubble.side === "right" ? "speech-tail-right" : ""} ${isMobile ? "hidden" : ""}`}
               />
             </div>
           </motion.div>

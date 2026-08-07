@@ -15,7 +15,7 @@ export function VideoMoment() {
     () => {
       gsap.from(".video-frame", {
         opacity: 0,
-        scale: 0.94,
+        scale: 0.96,
         duration: 1.2,
         ease: "power3.out",
         scrollTrigger: {
@@ -29,11 +29,14 @@ export function VideoMoment() {
 
   return (
     <section ref={rootRef} className="relative px-6 py-24">
-      <div className="mx-auto max-w-4xl text-center">
+      <div className="mx-auto max-w-5xl text-center">
         <p className="mb-3 text-xs uppercase tracking-[0.35em] text-[var(--gold)]">
           Un instante
         </p>
-        <h2 data-cinema="title" className="font-display text-4xl text-[var(--cream)] sm:text-5xl">
+        <h2
+          data-cinema="title"
+          className="font-display text-4xl text-[var(--cream)] sm:text-5xl"
+        >
           Un pedacito en movimiento
         </h2>
         <p className="mx-auto mt-4 max-w-lg text-white/55">
@@ -41,15 +44,19 @@ export function VideoMoment() {
           <ReactiveWord>Gracias por existir.</ReactiveWord>
         </p>
 
-        <div className="video-frame relative mx-auto mt-12 overflow-hidden rounded-[2rem] border border-white/10 bg-black shadow-[0_40px_100px_-40px_rgba(0,0,0,0.9)]">
+        <div className="video-frame relative mx-auto mt-12 overflow-hidden rounded-[1.5rem] border border-white/10 bg-black shadow-[0_40px_100px_-40px_rgba(0,0,0,0.9)] sm:rounded-[2rem]">
           <video
             src="/video.mp4"
             controls
             playsInline
-            className="aspect-video w-full object-cover"
+            controlsList="nodownload"
+            className="mx-auto max-h-[min(78vh,720px)] w-full bg-black object-contain"
             preload="metadata"
           />
         </div>
+        <p className="mt-3 text-xs text-white/35">
+          Tip: usa pantalla completa para verlo entero.
+        </p>
       </div>
     </section>
   );
