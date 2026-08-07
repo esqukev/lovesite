@@ -37,6 +37,22 @@ body {
   letter-spacing: -0.02em;
 }
 
+.font-letter {
+  font-family: var(--font-letter), "Segoe Script", cursive;
+}
+
+.paper-texture {
+  background-color: #f4ebe0;
+  background-image:
+    radial-gradient(rgba(90, 60, 40, 0.04) 0.6px, transparent 0.6px),
+    linear-gradient(180deg, #f7f0e6 0%, #efe4d4 100%);
+  background-size: 3px 3px, 100% 100%;
+  box-shadow:
+    0 25px 70px rgba(0, 0, 0, 0.45),
+    inset 0 0 40px rgba(120, 80, 50, 0.08);
+  border: 1px solid rgba(90, 60, 40, 0.12);
+}
+
 .custom-cursor,
 .custom-cursor * {
   cursor: none !important;

@@ -4,8 +4,6 @@ import { FormEvent, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { GATE_PASSWORD } from "@/lib/data";
-import { useExperience } from "./ExperienceProvider";
-
 gsap.registerPlugin(useGSAP);
 
 export function Gate({ onUnlock }: { onUnlock: () => void }) {
@@ -14,7 +12,6 @@ export function Gate({ onUnlock }: { onUnlock: () => void }) {
   const [value, setValue] = useState("");
   const [error, setError] = useState(false);
   const [status, setStatus] = useState<"idle" | "ok" | "welcome">("idle");
-  const { setPhase } = useExperience();
 
   useGSAP(
     () => {
@@ -64,7 +61,6 @@ export function Gate({ onUnlock }: { onUnlock: () => void }) {
 
     const tl = gsap.timeline({
       onComplete: () => {
-        setPhase("welcome");
         onUnlock();
       },
     });
