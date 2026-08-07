@@ -4,7 +4,6 @@ import { FormEvent, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { GATE_PASSWORD } from "@/lib/data";
-import { softClick, softSuccess, softWhoosh } from "@/lib/sounds";
 import { useExperience } from "./ExperienceProvider";
 
 gsap.registerPlugin(useGSAP);
@@ -53,7 +52,6 @@ export function Gate({ onUnlock }: { onUnlock: () => void }) {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    softClick();
 
     if (value.trim().toLowerCase() !== GATE_PASSWORD) {
       setError(true);
@@ -63,7 +61,6 @@ export function Gate({ onUnlock }: { onUnlock: () => void }) {
 
     setError(false);
     setStatus("ok");
-    softSuccess();
 
     const tl = gsap.timeline({
       onComplete: () => {
@@ -93,7 +90,6 @@ export function Gate({ onUnlock }: { onUnlock: () => void }) {
         filter: "blur(16px)",
         duration: 1.2,
         ease: "power2.inOut",
-        onStart: softWhoosh,
       });
   };
 

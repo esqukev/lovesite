@@ -19,9 +19,11 @@ export function SmoothScroll({
     if (!enabled) return;
 
     const lenis = new Lenis({
-      duration: 1.2,
+      duration: 1.45,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
+      touchMultiplier: 1.15,
+      wheelMultiplier: 0.95,
     });
 
     lenis.on("scroll", ScrollTrigger.update);
@@ -32,7 +34,15 @@ export function SmoothScroll({
     gsap.ticker.add(ticker);
     gsap.ticker.lagSmoothing(0);
 
+    const onResize = () => ScrollTrigger.refresh();
+    window.addEventListener("resize", onResize);
+
+    // Refresh after images/layout settle
+    const refreshTimer = window.setTimeout(() => ScrollTrigger.refresh(), 600);
+
     return () => {
+      window.clearTimeout(refreshTimer);
+      window.removeEventListener("resize", onResize);
       gsap.ticker.remove(ticker);
       lenis.destroy();
     };

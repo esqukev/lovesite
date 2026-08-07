@@ -15,18 +15,37 @@ export function Memories() {
   useGSAP(
     () => {
       gsap.utils.toArray<HTMLElement>(".memory-card").forEach((card, i) => {
+        const img = card.querySelector(".memory-img");
         gsap.from(card, {
           opacity: 0,
-          y: 60,
-          x: i % 2 === 0 ? -40 : 40,
-          rotate: i % 2 === 0 ? -1.5 : 1.5,
-          duration: 1.1,
+          y: 80,
+          x: i % 2 === 0 ? -50 : 50,
+          rotate: i % 2 === 0 ? -2 : 2,
+          duration: 1.2,
           ease: "power3.out",
           scrollTrigger: {
             trigger: card,
             start: "top 85%",
           },
         });
+
+        if (img) {
+          gsap.fromTo(
+            img,
+            { scale: 1.18, yPercent: -6 },
+            {
+              scale: 1,
+              yPercent: 0,
+              ease: "none",
+              scrollTrigger: {
+                trigger: card,
+                start: "top bottom",
+                end: "bottom top",
+                scrub: true,
+              },
+            },
+          );
+        }
       });
     },
     { scope: rootRef },
@@ -37,18 +56,21 @@ export function Memories() {
       <div className="mx-auto max-w-5xl">
         <div className="mb-16 max-w-xl">
           <p className="mb-3 text-xs uppercase tracking-[0.35em] text-[var(--gold)]">
-            Recuerdos
+            Nivel 02 · Recuerdos
           </p>
-          <h2 className="font-display text-4xl text-[var(--cream)] sm:text-5xl">
+          <h2
+            data-cinema="title"
+            className="font-display text-4xl text-[var(--cream)] sm:text-5xl"
+          >
             Pedacitos de nosotros
           </h2>
-          <p className="mt-4 text-white/55">
+          <p className="mt-4 text-white/55" data-cinema="fade-up">
             Momentos que merecen quedarse. No por lo grandes que fueron, sino
             por cómo nos hicieron sentir.
           </p>
         </div>
 
-        <div className="relative space-y-10 before:absolute before:left-4 before:top-0 before:h-full before:w-px before:bg-gradient-to-b before:from-transparent before:via-white/15 before:to-transparent sm:before:left-1/2">
+        <div className="relative space-y-14 before:absolute before:left-4 before:top-0 before:h-full before:w-px before:bg-gradient-to-b before:from-transparent before:via-white/15 before:to-transparent sm:before:left-1/2">
           {MEMORIES.map((memory, index) => (
             <article
               key={memory.id}
@@ -57,12 +79,12 @@ export function Memories() {
               }`}
             >
               <div className="relative ml-10 overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] sm:ml-0">
-                <div className="relative aspect-[4/3]">
+                <div className="relative aspect-[4/3] overflow-hidden" data-cinema="scale">
                   <Image
                     src={memory.image}
                     alt={memory.title}
                     fill
-                    className="object-cover transition-transform duration-700 hover:scale-105"
+                    className="memory-img object-cover"
                     sizes="(max-width: 768px) 100vw, 40vw"
                   />
                 </div>

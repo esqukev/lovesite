@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import confetti from "canvas-confetti";
 import { Button } from "@/components/ui/button";
-import { softClick, softSuccess } from "@/lib/sounds";
 import { useExperience } from "./ExperienceProvider";
 
 export function Invitation({ active }: { active: boolean }) {
@@ -47,7 +46,6 @@ export function Invitation({ active }: { active: boolean }) {
   }, [active, inviteAccepted, setInviteOpen]);
 
   const accept = () => {
-    softSuccess();
     setInviteAccepted(true);
     setInviteOpen(false);
     setShowThanks(true);
@@ -61,7 +59,6 @@ export function Invitation({ active }: { active: boolean }) {
   };
 
   const dodge = () => {
-    softClick();
     const next = noAttempts + 1;
     setNoAttempts(next);
     if (next < 4) {

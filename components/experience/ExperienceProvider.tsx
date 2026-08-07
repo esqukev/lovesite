@@ -19,8 +19,6 @@ type ExperienceContextValue = {
   eggsFound: Set<EasterEggId>;
   discoverEgg: (id: EasterEggId) => void;
   allEggsFound: boolean;
-  soundEnabled: boolean;
-  setSoundEnabled: (v: boolean) => void;
   inviteAccepted: boolean;
   setInviteAccepted: (v: boolean) => void;
   inviteOpen: boolean;
@@ -32,7 +30,6 @@ const ExperienceContext = createContext<ExperienceContextValue | null>(null);
 export function ExperienceProvider({ children }: { children: ReactNode }) {
   const [phase, setPhase] = useState<Phase>("gate");
   const [eggsFound, setEggsFound] = useState<Set<EasterEggId>>(new Set());
-  const [soundEnabled, setSoundEnabledState] = useState(false);
   const [inviteAccepted, setInviteAccepted] = useState(false);
   const [inviteOpen, setInviteOpen] = useState(false);
 
@@ -45,11 +42,6 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  const setSoundEnabled = useCallback((v: boolean) => {
-    setSoundEnabledState(v);
-    void import("@/lib/sounds").then((m) => m.setSoundEnabled(v));
-  }, []);
-
   const value = useMemo<ExperienceContextValue>(
     () => ({
       phase,
@@ -57,22 +49,12 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
       eggsFound,
       discoverEgg,
       allEggsFound: EASTER_EGG_IDS.every((id) => eggsFound.has(id)),
-      soundEnabled,
-      setSoundEnabled,
       inviteAccepted,
       setInviteAccepted,
       inviteOpen,
       setInviteOpen,
     }),
-    [
-      phase,
-      eggsFound,
-      discoverEgg,
-      soundEnabled,
-      setSoundEnabled,
-      inviteAccepted,
-      inviteOpen,
-    ],
+    [phase, eggsFound, discoverEgg, inviteAccepted, inviteOpen],
   );
 
   return (

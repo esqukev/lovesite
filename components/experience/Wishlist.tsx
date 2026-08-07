@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import confetti from "canvas-confetti";
 import { Check } from "lucide-react";
 import { WISHLIST } from "@/lib/data";
-import { softClick, softSuccess } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 
 const STORAGE_KEY = "motzy-wishlist";
@@ -32,7 +31,6 @@ export function Wishlist() {
   useEffect(() => {
     if (completed && !celebrated) {
       setCelebrated(true);
-      softSuccess();
       confetti({
         particleCount: 120,
         spread: 70,
@@ -43,7 +41,6 @@ export function Wishlist() {
   }, [completed, celebrated]);
 
   const toggle = (id: string) => {
-    softClick();
     setChecked((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
@@ -54,7 +51,7 @@ export function Wishlist() {
           <p className="mb-3 text-xs uppercase tracking-[0.35em] text-[var(--gold)]">
             Por vivir
           </p>
-          <h2 className="font-display text-4xl text-[var(--cream)] sm:text-5xl">
+          <h2 data-cinema="title" className="font-display text-4xl text-[var(--cream)] sm:text-5xl">
             Cosas que quiero vivir contigo
           </h2>
           <p className="mx-auto mt-4 max-w-lg text-white/55">

@@ -16,18 +16,55 @@ export function Hero() {
 
   useGSAP(
     () => {
-      gsap.from(".hero-reveal", {
+      const tl = gsap.timeline({ delay: 0.15 });
+      tl.from(".hero-reveal", {
         opacity: 0,
-        y: 40,
-        filter: "blur(8px)",
-        duration: 1.2,
-        stagger: 0.18,
+        y: 50,
+        filter: "blur(10px)",
+        duration: 1.25,
+        stagger: 0.16,
         ease: "power3.out",
-        delay: 0.2,
       });
 
       gsap.to(".hero-parallax", {
-        yPercent: 18,
+        yPercent: 28,
+        ease: "none",
+        scrollTrigger: {
+          trigger: rootRef.current,
+          start: "top top",
+          end: "bottom top",
+          scrub: true,
+        },
+      });
+
+      gsap.to(".hero-content", {
+        yPercent: -12,
+        opacity: 0.15,
+        scale: 0.94,
+        ease: "none",
+        scrollTrigger: {
+          trigger: rootRef.current,
+          start: "top top",
+          end: "bottom top",
+          scrub: 1,
+        },
+      });
+
+      gsap.to(".hero-orb-a", {
+        xPercent: -20,
+        yPercent: 30,
+        ease: "none",
+        scrollTrigger: {
+          trigger: rootRef.current,
+          start: "top top",
+          end: "bottom top",
+          scrub: true,
+        },
+      });
+
+      gsap.to(".hero-orb-b", {
+        xPercent: 25,
+        yPercent: -20,
         ease: "none",
         scrollTrigger: {
           trigger: rootRef.current,
@@ -61,16 +98,17 @@ export function Hero() {
   return (
     <section
       ref={rootRef}
-      className="relative flex min-h-[100svh] items-center justify-center overflow-hidden px-6 pb-24 pt-28"
+      className="relative flex min-h-[110svh] items-center justify-center overflow-hidden px-6 pb-28 pt-32"
     >
       <div className="hero-parallax pointer-events-none absolute inset-0">
-        <div className="absolute left-1/2 top-1/4 h-[40vw] w-[40vw] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(232,180,184,0.18),transparent_65%)] blur-2xl" />
-        <div className="absolute bottom-1/4 right-1/5 h-[28vw] w-[28vw] rounded-full bg-[radial-gradient(circle,rgba(196,165,116,0.12),transparent_70%)] blur-2xl" />
+        <div className="hero-orb-a absolute left-1/2 top-1/4 h-[48vw] w-[48vw] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(232,180,184,0.22),transparent_65%)] blur-2xl" />
+        <div className="hero-orb-b absolute bottom-1/4 right-1/5 h-[32vw] w-[32vw] rounded-full bg-[radial-gradient(circle,rgba(196,165,116,0.16),transparent_70%)] blur-2xl" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(12,10,9,0.85)_85%)]" />
       </div>
 
-      <div className="relative z-10 mx-auto max-w-4xl text-center">
+      <div className="hero-content relative z-10 mx-auto max-w-4xl text-center">
         <p className="hero-reveal mb-6 text-xs uppercase tracking-[0.4em] text-[var(--gold)]">
-          Solo nosotros
+          Nivel 01 · Solo nosotros
         </p>
         <h1
           ref={titleRef}
@@ -93,7 +131,7 @@ export function Hero() {
 
         <div className="hero-reveal mt-16 flex flex-col items-center gap-3 text-white/40">
           <span className="text-[10px] uppercase tracking-[0.35em]">
-            Desliza
+            Empieza el recorrido
           </span>
           <div className="scroll-indicator h-12 w-[1px] overflow-hidden bg-white/15">
             <div className="h-full w-full origin-top animate-[scrollPulse_1.8s_ease-in-out_infinite] bg-[var(--accent)]" />

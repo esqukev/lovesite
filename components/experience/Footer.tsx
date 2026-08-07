@@ -5,7 +5,6 @@ import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useExperience } from "./ExperienceProvider";
-import { softSuccess } from "@/lib/sounds";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -44,8 +43,7 @@ export function Footer() {
       clicks.current = 0;
       setSecret(true);
       discoverEgg("footer-secret");
-      softSuccess();
-    }
+      }
   };
 
   return (

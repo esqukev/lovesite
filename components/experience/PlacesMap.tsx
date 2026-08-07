@@ -1,15 +1,15 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useMemo, useState } from "react";
-import Image from "next/image";
+import { useState } from "react";
 import { PLACES } from "@/lib/data";
-import { MapPin, X } from "lucide-react";
+import { MapPin } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const MapInner = dynamic(() => import("./PlacesMapInner"), {
   ssr: false,
   loading: () => (
-    <div className="flex h-[520px] items-center justify-center rounded-[2rem] border border-white/10 bg-white/[0.03] text-white/40">
+    <div className="flex h-[560px] items-center justify-center rounded-[2rem] border border-white/10 bg-white/[0.03] text-white/40">
       Cargando nuestro mapa...
     </div>
   ),
@@ -17,10 +17,6 @@ const MapInner = dynamic(() => import("./PlacesMapInner"), {
 
 export function PlacesMap() {
   const [activeId, setActiveId] = useState<string | null>(null);
-  const active = useMemo(
-    () => PLACES.find((p) => p.id === activeId) ?? null,
-    [activeId],
-  );
 
   return (
     <section id="mapa" className="relative px-6 py-28">
@@ -29,54 +25,64 @@ export function PlacesMap() {
           <p className="mb-3 text-xs uppercase tracking-[0.35em] text-[var(--gold)]">
             Lugares
           </p>
-          <h2 className="font-display text-4xl text-[var(--cream)] sm:text-5xl">
+          <h2 data-cinema="title" className="font-display text-4xl text-[var(--cream)] sm:text-5xl">
             Nuestro mapa
           </h2>
           <p className="mt-4 text-white/55">
-            Coordenadas de momentos. Cada punto guarda un pedacito de nuestra
-            historia.
+            Cada punto ya muestra su nombre. Toca uno para leer el recuerdo —
+            y toca el mapa vacío para volver a verlo completo.
           </p>
         </div>
 
         <div className="relative overflow-hidden rounded-[2rem] border border-white/10 shadow-[0_40px_100px_-50px_rgba(0,0,0,0.8)]">
-          <MapInner activeId={activeId} onSelect={setActiveId} />
-
-          {active && (
-            <div className="absolute bottom-4 left-4 right-4 z-[500] overflow-hidden rounded-2xl border border-white/15 bg-black/70 shadow-2xl backdrop-blur-xl sm:left-auto sm:right-4 sm:w-80">
-              <button
-                type="button"
-                className="absolute right-3 top-3 z-10 rounded-full bg-white/10 p-1.5 text-white"
-                onClick={() => setActiveId(null)}
-                aria-label="Cerrar"
-              >
-                <X size={14} />
-              </button>
-              <div className="relative h-36 w-full">
-                <Image
-                  src={active.image}
-                  alt={active.name}
-                  fill
-                  className="object-cover"
-                  sizes="320px"
-                />
-              </div>
-              <div className="p-4">
-                <div className="mb-1 flex items-center gap-2 text-[var(--accent)]">
-                  <MapPin size={14} />
-                  <span className="text-xs uppercase tracking-[0.2em]">
-                    Lugar
-                  </span>
-                </div>
-                <h3 className="font-display text-2xl text-[var(--cream)]">
-                  {active.name}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-white/65">
-                  {active.description}
-                </p>
-              </div>
-            </div>
+          <MapInner
+            activeId={activeId}
+            onSelect={setActiveId}
+            onClear={() => setActiveId(null)}
+          />
+          {activeId && (
+            <button
+              type="button"
+              onClick={() => setActiveId(null)}
+              className="absolute left-4 top-4 z-[500] rounded-full border border-white/15 bg-black/70 px-4 py-2 text-xs uppercase tracking-[0.2em] text-white/80 backdrop-blur-md transition hover:bg-black/85"
+            >
+              Volver al mapa
+            </button>
           )}
         </div>
+
+        <ul className="mt-6 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+          {PLACES.map((place) => (
+            <li key={place.id}>
+              <button
+                type="button"
+                data-cursor="hover"
+                onClick={() =>
+                  setActiveId((prev) => (prev === place.id ? null : place.id))
+                }
+                className={cn(
+                  "flex w-full items-start gap-2 rounded-2xl border px-3 py-3 text-left transition-all",
+                  activeId === place.id
+                    ? "border-[var(--accent)]/50 bg-[var(--accent)]/10"
+                    : "border-white/10 bg-white/[0.03] hover:bg-white/[0.06]",
+                )}
+              >
+                <MapPin
+                  size={14}
+                  className="mt-0.5 shrink-0 text-[var(--accent)]"
+                />
+                <span>
+                  <span className="block text-sm text-[var(--cream)]">
+                    {place.name}
+                  </span>
+                  <span className="mt-1 block text-xs leading-relaxed text-white/45">
+                    {place.description}
+                  </span>
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );

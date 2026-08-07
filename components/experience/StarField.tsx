@@ -4,7 +4,6 @@ import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { STAR_PHRASES } from "@/lib/data";
 import { useExperience } from "./ExperienceProvider";
-import { softClick } from "@/lib/sounds";
 
 type Star = { id: number; x: number; y: number; size: number; delay: number };
 
@@ -27,7 +26,6 @@ export function StarField() {
 
   const onStarClick = (e: React.MouseEvent<HTMLButtonElement>, star: Star) => {
     e.stopPropagation();
-    softClick();
     discoverEgg("star-phrase");
     setPos({ x: star.x, y: star.y });
     setPhrase(STAR_PHRASES[Math.floor(Math.random() * STAR_PHRASES.length)]);

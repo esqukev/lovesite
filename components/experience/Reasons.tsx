@@ -4,7 +4,6 @@ import { useRef, useState } from "react";
 import { gsap } from "gsap";
 import { REASONS } from "@/lib/data";
 import { useExperience } from "./ExperienceProvider";
-import { softClick } from "@/lib/sounds";
 
 const ANIMATIONS = [
   { y: -20, rotate: -4, scale: 1.05 },
@@ -26,7 +25,6 @@ export function Reasons() {
   const { discoverEgg } = useExperience();
 
   const next = () => {
-    softClick();
     const el = cardRef.current;
     const anim = ANIMATIONS[index % ANIMATIONS.length];
     if (el) {
@@ -49,7 +47,7 @@ export function Reasons() {
         <p className="mb-3 text-xs uppercase tracking-[0.35em] text-[var(--gold)]">
           Pequeñas cosas
         </p>
-        <h2 className="font-display text-4xl text-[var(--cream)] sm:text-5xl">
+        <h2 data-cinema="title" className="font-display text-4xl text-[var(--cream)] sm:text-5xl">
           Cosas que amo de ti
         </h2>
         <p className="mx-auto mt-4 max-w-lg text-white/55">

@@ -3,7 +3,6 @@
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { useExperience } from "./ExperienceProvider";
-import { softClick } from "@/lib/sounds";
 
 export function AmbientEffects({ active }: { active: boolean }) {
   const layerRef = useRef<HTMLDivElement>(null);
@@ -56,7 +55,6 @@ export function HeartButton({ className }: { className?: string }) {
   const hostRef = useRef<HTMLButtonElement>(null);
 
   const burst = () => {
-    softClick();
     discoverEgg("heart-float");
     const host = hostRef.current;
     if (!host) return;

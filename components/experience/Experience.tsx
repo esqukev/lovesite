@@ -18,8 +18,12 @@ import { Footer } from "./Footer";
 import { StarField } from "./StarField";
 import { AmbientEffects, HeartButton, ReactiveWord } from "./AmbientEffects";
 import { HiddenPhrases } from "./HiddenPhrases";
-import { SoundToggle } from "./SoundToggle";
 import { VideoMoment } from "./VideoMoment";
+import { FloatingHearts } from "./FloatingHearts";
+import { CatSquad } from "./CatSquad";
+import { PhraseHotspots } from "./PhraseHotspots";
+import { ScrollHUD } from "./ScrollHUD";
+import { CinemaScroll } from "./CinemaScroll";
 
 function ExperienceInner() {
   const { phase } = useExperience();
@@ -32,6 +36,9 @@ function ExperienceInner() {
     <>
       <CustomCursor active={main} />
       <AmbientEffects active={main} />
+      <FloatingHearts active={main} />
+      <CatSquad active={main} />
+      <ScrollHUD active={main} />
       {phase === "gate" && <Gate onUnlock={() => setUnlocked(true)} />}
       {phase === "welcome" && unlocked && (
         <WelcomeLetter onStart={() => setStarted(true)} />
@@ -40,25 +47,28 @@ function ExperienceInner() {
       {main && (
         <SmoothScroll enabled>
           <div className="experience-root relative min-h-screen overflow-x-hidden bg-[var(--void)] text-[var(--cream)]">
+            <CinemaScroll enabled />
             <StarField />
             <HiddenPhrases />
+            <PhraseHotspots />
 
-            <header className="fixed left-0 right-0 top-0 z-40 flex items-center justify-between px-5 py-5">
+            <header className="fixed left-0 right-0 top-0 z-40 flex items-center justify-between px-5 py-5 pt-6">
               <div className="font-display text-lg tracking-wide text-[var(--cream)]/90">
                 Motzy <HeartButton className="ml-1 inline-block align-middle" />
               </div>
               <p className="hidden text-[10px] uppercase tracking-[0.3em] text-white/35 sm:block">
-                Nuestro universo
+                Modo universo
               </p>
             </header>
 
             <main>
               <Hero />
 
-              <section className="px-6 py-10 text-center">
+              <section className="px-6 py-10 text-center" data-cinema="fade-up">
                 <p className="mx-auto max-w-2xl text-lg text-white/50">
-                  <ReactiveWord>Eres mi lugar favorito.</ReactiveWord> Aquí
-                  empieza el recorrido — sin prisa, como nos gusta.
+                  <ReactiveWord>Eres mi lugar favorito.</ReactiveWord> Explora,
+                  toca, descubre. Esto no es una página: es nuestro nivel
+                  secreto.
                 </p>
               </section>
 
@@ -72,7 +82,6 @@ function ExperienceInner() {
               <Footer />
             </main>
 
-            <SoundToggle />
             <Invitation active />
           </div>
         </SmoothScroll>

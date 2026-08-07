@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { WELCOME_LETTER } from "@/lib/data";
 import { Button } from "@/components/ui/button";
-import { softClick } from "@/lib/sounds";
 import { useExperience } from "./ExperienceProvider";
 
 export function WelcomeLetter({ onStart }: { onStart: () => void }) {
@@ -28,7 +27,6 @@ export function WelcomeLetter({ onStart }: { onStart: () => void }) {
   }, []);
 
   const handleStart = () => {
-    softClick();
     gsap.to(rootRef.current, {
       opacity: 0,
       y: -30,

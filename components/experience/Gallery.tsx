@@ -9,7 +9,6 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { X } from "lucide-react";
 import { GALLERY_IMAGES } from "@/lib/data";
 import { useExperience } from "./ExperienceProvider";
-import { softClick } from "@/lib/sounds";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -105,7 +104,6 @@ export function Gallery() {
 
   const spawnParticles = (e: React.MouseEvent) => {
     discoverEgg("photo-particles");
-    softClick();
     const host = burstRef.current;
     if (!host) return;
     const rect = host.getBoundingClientRect();
@@ -135,7 +133,7 @@ export function Gallery() {
           <p className="mb-3 text-xs uppercase tracking-[0.35em] text-[var(--gold)]">
             Galería
           </p>
-          <h2 className="font-display text-4xl text-[var(--cream)] sm:text-5xl">
+          <h2 data-cinema="title" className="font-display text-4xl text-[var(--cream)] sm:text-5xl">
             Nuestras fotos
           </h2>
           <p className="mt-4 text-white/55">
@@ -161,7 +159,6 @@ export function Gallery() {
                 alt={img.alt}
                 className="h-full w-full"
                 onOpen={() => {
-                  softClick();
                   setActive(index);
                 }}
                 onDouble={spawnParticles}

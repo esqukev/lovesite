@@ -190,6 +190,8 @@ export const EASTER_EGG_IDS = [
   "slow-particles",
   "word-react",
   "all-reasons",
+  "cat-meow",
+  "phrase-orb",
 ] as const;
 
 export type EasterEggId = (typeof EASTER_EGG_IDS)[number];
