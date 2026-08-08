@@ -19,6 +19,15 @@ const CAT_LINES = [
   "Vamos por un cafecito",
   "miau… ella es tu persona favorita",
   "¿ya le dijiste que la amas hoy?",
+  "Quiero comida con motz",
+  "Escuché una rana",
+  "Vamos al cine",
+  "Te extraño",
+  "Me vuelves loquito",
+  "Eres mi vida",
+  "Me pones bichito",
+  "Guapota",
+  "Quiero besos",
 ];
 
 type Spot = { top: string; left?: string; right?: string; side: "left" | "right" };
