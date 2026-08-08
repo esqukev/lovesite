@@ -14,7 +14,9 @@ export function Invitation({ active }: { active: boolean }) {
     inviteOpen,
     setInviteOpen,
     inviteAccepted,
+    ownerInviteSeen,
     acceptInvite,
+    markOwnerInviteSeen,
   } = useExperience();
   const [noAttempts, setNoAttempts] = useState(0);
   const [noPos, setNoPos] = useState({ x: 0, y: 0 });
@@ -23,14 +25,17 @@ export function Invitation({ active }: { active: boolean }) {
   const noRef = useRef<HTMLButtonElement>(null);
   const triggered = useRef(false);
 
-  // guest (motzy) y owner (kevin, para pruebas) pueden verla si no está aceptada
+  // Motzy: hasta que acepte. Kevin: solo una vez en este navegador.
   const canInvite =
-    (visitorRole === "guest" || visitorRole === "owner") && !inviteAccepted;
+    visitorRole === "guest"
+      ? !inviteAccepted
+      : visitorRole === "owner"
+        ? !ownerInviteSeen && !inviteAccepted
+        : false;
 
   useEffect(() => {
-    // Al cambiar de rol / reset, permitir disparar de nuevo
     triggered.current = false;
-  }, [visitorRole, inviteAccepted]);
+  }, [visitorRole, inviteAccepted, ownerInviteSeen]);
 
   useEffect(() => {
     if (!active || !canInvite || triggered.current) return;
@@ -44,7 +49,6 @@ export function Invitation({ active }: { active: boolean }) {
       }
     };
 
-    // Kevin/pruebas: sale más pronto; Motzy: también por scroll o a los 45s
     const timer = window.setTimeout(() => {
       if (!triggered.current && canInvite) {
         triggered.current = true;
@@ -60,8 +64,12 @@ export function Invitation({ active }: { active: boolean }) {
     };
   }, [active, canInvite, visitorRole, setInviteOpen]);
 
+  const dismissForOwner = () => {
+    if (visitorRole === "owner") markOwnerInviteSeen();
+    else setInviteOpen(false);
+  };
+
   const accept = () => {
-    // Cierra el popup pero aún no persiste: se guarda al enviar WhatsApp
     setInviteOpen(false);
     setShowFrost(true);
     confetti({
@@ -78,7 +86,6 @@ export function Invitation({ active }: { active: boolean }) {
     setShowSend(true);
   };
 
-  /** WhatsApp con el mensaje listo; ahí sí queda aceptada de forma permanente */
   const sendToPhone = () => {
     acceptInvite();
     window.open(
@@ -87,6 +94,11 @@ export function Invitation({ active }: { active: boolean }) {
       "noopener,noreferrer",
     );
     setShowSend(false);
+  };
+
+  const closeSend = () => {
+    setShowSend(false);
+    if (visitorRole === "owner") markOwnerInviteSeen();
   };
 
   const dodge = () => {
@@ -152,7 +164,7 @@ export function Invitation({ active }: { active: boolean }) {
                   }}
                   onClick={() => {
                     if (noAttempts >= 4) {
-                      setInviteOpen(false);
+                      dismissForOwner();
                     } else {
                       dodge();
                     }
@@ -199,17 +211,22 @@ export function Invitation({ active }: { active: boolean }) {
                 toca el link y la cita queda en tu Calendario.
               </p>
 
-              <Button size="lg" className="mt-8 w-full sm:w-auto" onClick={sendToPhone}>
-                Abrir WhatsApp
-              </Button>
-
-              <button
-                type="button"
-                onClick={() => setShowSend(false)}
-                className="mt-5 text-sm text-white/40 transition hover:text-white/70"
-              >
-                Cerrar
-              </button>
+              <div className="mt-8 flex flex-col items-center gap-5">
+                <Button
+                  size="lg"
+                  className="w-full sm:w-auto"
+                  onClick={sendToPhone}
+                >
+                  Abrir WhatsApp
+                </Button>
+                <button
+                  type="button"
+                  onClick={closeSend}
+                  className="text-sm text-white/45 transition hover:text-white/75"
+                >
+                  Cerrar
+                </button>
+              </div>
             </motion.div>
           </motion.div>
         )}

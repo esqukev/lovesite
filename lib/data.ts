@@ -7,6 +7,8 @@ export const GATE_PASSWORDS: Record<string, VisitorRole> = {
 };
 
 export const INVITE_ACCEPTED_KEY = "motzy-date-invite-accepted";
+/** Kevin: la invitación de prueba solo una vez por navegador */
+export const OWNER_INVITE_SEEN_KEY = "motzy-owner-invite-seen";
 export const VISITOR_ROLE_KEY = "motzy-visitor-role";
 
 /** Domingo 16 de agosto 2026 — Costa Rica */

@@ -14,6 +14,7 @@ import type { EasterEggId, VisitorRole } from "@/lib/data";
 import {
   EASTER_EGG_IDS,
   INVITE_ACCEPTED_KEY,
+  OWNER_INVITE_SEEN_KEY,
   VISITOR_ROLE_KEY,
 } from "@/lib/data";
 
@@ -42,7 +43,9 @@ type ExperienceContextValue = {
   toasts: Toast[];
   pushToast: (title: string, detail?: string) => void;
   inviteAccepted: boolean;
+  ownerInviteSeen: boolean;
   acceptInvite: () => void;
+  markOwnerInviteSeen: () => void;
   inviteOpen: boolean;
   setInviteOpen: (v: boolean) => void;
   lightboxOpen: boolean;
@@ -59,6 +62,7 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
   const [collectibles, setCollectibles] = useState(0);
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [inviteAccepted, setInviteAccepted] = useState(false);
+  const [ownerInviteSeen, setOwnerInviteSeen] = useState(false);
   const [inviteOpen, setInviteOpen] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const toastSeq = useRef(0);
@@ -67,6 +71,9 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
     try {
       if (localStorage.getItem(INVITE_ACCEPTED_KEY) === "1") {
         setInviteAccepted(true);
+      }
+      if (localStorage.getItem(OWNER_INVITE_SEEN_KEY) === "1") {
+        setOwnerInviteSeen(true);
       }
       const saved = sessionStorage.getItem(VISITOR_ROLE_KEY);
       if (saved === "guest" || saved === "owner") {
@@ -84,16 +91,15 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
     } catch {
       /* private mode */
     }
+  }, []);
 
-    // Entrar como kevin siempre reactiva la invitación (modo prueba)
-    if (role === "owner") {
-      setInviteAccepted(false);
-      setInviteOpen(false);
-      try {
-        localStorage.removeItem(INVITE_ACCEPTED_KEY);
-      } catch {
-        /* private mode */
-      }
+  const markOwnerInviteSeen = useCallback(() => {
+    setOwnerInviteSeen(true);
+    setInviteOpen(false);
+    try {
+      localStorage.setItem(OWNER_INVITE_SEEN_KEY, "1");
+    } catch {
+      /* private mode */
     }
   }, []);
 
@@ -102,10 +108,13 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
     setInviteOpen(false);
     try {
       localStorage.setItem(INVITE_ACCEPTED_KEY, "1");
+      // Si Kevin acepta en prueba, también cuenta como "ya la vio"
+      localStorage.setItem(OWNER_INVITE_SEEN_KEY, "1");
+      setOwnerInviteSeen(true);
     } catch {
       /* private mode */
     }
-  }, [setInviteOpen]);
+  }, []);
 
   const pushToast = useCallback((title: string, detail?: string) => {
     toastSeq.current += 1;
@@ -157,7 +166,9 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
       toasts,
       pushToast,
       inviteAccepted,
+      ownerInviteSeen,
       acceptInvite,
+      markOwnerInviteSeen,
       inviteOpen,
       setInviteOpen,
       lightboxOpen,
@@ -175,7 +186,9 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
       toasts,
       pushToast,
       inviteAccepted,
+      ownerInviteSeen,
       acceptInvite,
+      markOwnerInviteSeen,
       inviteOpen,
       lightboxOpen,
     ],
