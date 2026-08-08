@@ -162,7 +162,6 @@ body {
 }
 
 .sticky-note {
-  position: absolute;
   width: min(168px, 42vw);
   padding: 1.45rem 1rem 1.15rem;
   border-radius: 3px 3px 10px 4px;

@@ -12,6 +12,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { createPortal } from "react-dom";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useExperience } from "./ExperienceProvider";
@@ -21,15 +22,15 @@ type Note = {
   text: string;
   color: string;
   rotate: number;
-  /** % of experience-root width */
+  /** % of viewport width */
   x: number;
-  /** % of experience-root height */
+  /** % of viewport height */
   y: number;
   z: number;
 };
 
 type Store = {
-  version: 3;
+  version: 4;
   notes: Note[];
 };
 
@@ -48,7 +49,7 @@ type NotesContextValue = {
   onPointerDown: (e: ReactPointerEvent, note: Note) => void;
 };
 
-const STORAGE_KEY = "motzy-sticky-notes-v3";
+const STORAGE_KEY = "motzy-sticky-notes-v4";
 
 const NOTE_COLORS = [
   "#fff4c8",
@@ -66,7 +67,7 @@ const SEED_NOTES: Note[] = [
     color: "#ffd9e2",
     rotate: -4,
     x: 4,
-    y: 12,
+    y: 22,
     z: 1,
   },
   {
@@ -75,7 +76,7 @@ const SEED_NOTES: Note[] = [
     color: "#fff4c8",
     rotate: 3,
     x: 78,
-    y: 38,
+    y: 30,
     z: 2,
   },
   {
@@ -83,7 +84,7 @@ const SEED_NOTES: Note[] = [
     text: "Hoy también te elijo.",
     color: "#d9f0e4",
     rotate: -2,
-    x: 6,
+    x: 8,
     y: 68,
     z: 3,
   },
@@ -94,23 +95,19 @@ const NotesContext = createContext<NotesContextValue | null>(null);
 function readStore(): Store {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return { version: 3, notes: SEED_NOTES };
+    if (!raw) return { version: 4, notes: SEED_NOTES };
     const parsed = JSON.parse(raw) as Store;
-    if (parsed?.version === 3 && Array.isArray(parsed.notes)) {
+    if (parsed?.version === 4 && Array.isArray(parsed.notes)) {
       return parsed;
     }
-    return { version: 3, notes: SEED_NOTES };
+    return { version: 4, notes: SEED_NOTES };
   } catch {
-    return { version: 3, notes: SEED_NOTES };
+    return { version: 4, notes: SEED_NOTES };
   }
 }
 
 function clamp(n: number, min: number, max: number) {
   return Math.min(max, Math.max(min, n));
-}
-
-function getRoot() {
-  return document.querySelector(".experience-root") as HTMLElement | null;
 }
 
 function useNotesContext() {
@@ -143,22 +140,19 @@ export function StickyNotesProvider({ children }: { children: ReactNode }) {
     if (!ready) return;
     localStorage.setItem(
       STORAGE_KEY,
-      JSON.stringify({ version: 3, notes } satisfies Store),
+      JSON.stringify({ version: 4, notes } satisfies Store),
     );
   }, [notes, ready]);
 
-  const bringFront = useCallback(
-    (id: string) => {
-      setTopZ((z) => {
-        const nextZ = z + 1;
-        setNotes((prev) =>
-          prev.map((n) => (n.id === id ? { ...n, z: nextZ } : n)),
-        );
-        return nextZ;
-      });
-    },
-    [],
-  );
+  const bringFront = useCallback((id: string) => {
+    setTopZ((z) => {
+      const nextZ = z + 1;
+      setNotes((prev) =>
+        prev.map((n) => (n.id === id ? { ...n, z: nextZ } : n)),
+      );
+      return nextZ;
+    });
+  }, []);
 
   const addNote = useCallback(
     (e: FormEvent) => {
@@ -166,24 +160,9 @@ export function StickyNotesProvider({ children }: { children: ReactNode }) {
       const text = draft.trim();
       if (!text) return;
 
-      const root = getRoot();
-      let x = 36;
-      let y = 55;
-      if (root) {
-        const rect = root.getBoundingClientRect();
-        x = clamp(
-          ((window.innerWidth / 2 - rect.left - 84) / Math.max(rect.width, 1)) *
-            100,
-          2,
-          88,
-        );
-        y = clamp(
-          ((window.innerHeight / 2 - rect.top - 60) / Math.max(rect.height, 1)) *
-            100,
-          2,
-          92,
-        );
-      }
+      // Spawn near viewport center so it's visible immediately
+      const x = clamp(((window.innerWidth / 2 - 84) / window.innerWidth) * 100, 2, 88);
+      const y = clamp(((window.innerHeight / 2 - 60) / window.innerHeight) * 100, 2, 88);
 
       setTopZ((z) => {
         const nextZ = z + 1;
@@ -206,13 +185,10 @@ export function StickyNotesProvider({ children }: { children: ReactNode }) {
     [draft],
   );
 
-  const removeNote = useCallback(
-    (id: string) => {
-      setNotes((prev) => prev.filter((n) => n.id !== id));
-      setEditingId((cur) => (cur === id ? null : cur));
-    },
-    [],
-  );
+  const removeNote = useCallback((id: string) => {
+    setNotes((prev) => prev.filter((n) => n.id !== id));
+    setEditingId((cur) => (cur === id ? null : cur));
+  }, []);
 
   const updateText = useCallback((id: string, text: string) => {
     setNotes((prev) => prev.map((n) => (n.id === id ? { ...n, text } : n)));
@@ -220,19 +196,17 @@ export function StickyNotesProvider({ children }: { children: ReactNode }) {
 
   const moveNote = useCallback((id: string, clientX: number, clientY: number) => {
     const drag = dragRef.current;
-    const root = getRoot();
-    if (!drag || drag.id !== id || !root) return;
+    if (!drag || drag.id !== id) return;
 
-    const rect = root.getBoundingClientRect();
     const x = clamp(
-      ((clientX - rect.left - drag.offsetX) / Math.max(rect.width, 1)) * 100,
+      ((clientX - drag.offsetX) / Math.max(window.innerWidth, 1)) * 100,
       0,
-      90,
+      88,
     );
     const y = clamp(
-      ((clientY - rect.top - drag.offsetY) / Math.max(rect.height, 1)) * 100,
+      ((clientY - drag.offsetY) / Math.max(window.innerHeight, 1)) * 100,
       0,
-      94,
+      88,
     );
 
     setNotes((prev) => prev.map((n) => (n.id === id ? { ...n, x, y } : n)));
@@ -244,17 +218,13 @@ export function StickyNotesProvider({ children }: { children: ReactNode }) {
       const target = e.target as HTMLElement;
       if (target.closest("button, textarea")) return;
 
-      const root = getRoot();
-      if (!root) return;
-
-      const rect = root.getBoundingClientRect();
-      const noteLeft = (note.x / 100) * rect.width;
-      const noteTop = (note.y / 100) * rect.height;
+      const noteLeft = (note.x / 100) * window.innerWidth;
+      const noteTop = (note.y / 100) * window.innerHeight;
 
       dragRef.current = {
         id: note.id,
-        offsetX: e.clientX - rect.left - noteLeft,
-        offsetY: e.clientY - rect.top - noteTop,
+        offsetX: e.clientX - noteLeft,
+        offsetY: e.clientY - noteTop,
       };
       setDraggingId(note.id);
       bringFront(note.id);
@@ -319,7 +289,7 @@ export function StickyNotesProvider({ children }: { children: ReactNode }) {
   );
 }
 
-/** Composer section — notes live on the full-site layer */
+/** Composer section — notes float fixed over the viewport */
 export function StickyNotes() {
   const { notes, draft, setDraft, addNote } = useNotesContext();
 
@@ -335,8 +305,8 @@ export function StickyNotes() {
           Notitas
         </h2>
         <p className="muted mx-auto mt-4 max-w-md text-sm leading-relaxed sm:text-base">
-          Pega una nota y arrástrala a cualquier parte del sitio. Se queda donde
-          la dejes.
+          Pega una nota y ponla donde quieras en la pantalla. Se queda fija,
+          aunque hagas scroll.
         </p>
 
         <form
@@ -362,15 +332,15 @@ export function StickyNotes() {
         </form>
 
         <p className="muted mt-6 text-xs">
-          {notes.length} notita{notes.length === 1 ? "" : "s"} · arrastra por
-          todo el sitio · doble click para editar
+          {notes.length} notita{notes.length === 1 ? "" : "s"} · fijas en
+          pantalla · doble click para editar
         </p>
       </div>
     </section>
   );
 }
 
-/** Free-floating notes over the whole experience */
+/** Viewport-fixed notes — immune to Pedacitos pin / page scroll */
 export function StickyNotesLayer() {
   const { lightboxOpen } = useExperience();
   const {
@@ -383,11 +353,14 @@ export function StickyNotesLayer() {
     updateText,
     onPointerDown,
   } = useNotesContext();
+  const [mounted, setMounted] = useState(false);
 
-  if (lightboxOpen) return null;
+  useEffect(() => setMounted(true), []);
 
-  return (
-    <div className="pointer-events-none absolute inset-0 z-[36] overflow-visible">
+  if (!mounted || lightboxOpen) return null;
+
+  return createPortal(
+    <div className="pointer-events-none fixed inset-0 z-[42] overflow-hidden">
       {notes.map((note) => {
         const editing = editingId === note.id;
         const dragging = draggingId === note.id;
@@ -400,9 +373,10 @@ export function StickyNotesLayer() {
               editing && "is-editing",
             )}
             style={{
-              left: `${note.x}%`,
-              top: `${note.y}%`,
-              zIndex: 36 + note.z,
+              position: "fixed",
+              left: `${note.x}vw`,
+              top: `${note.y}vh`,
+              zIndex: 42 + note.z,
               background: note.color,
               ["--note-rotate" as string]: `${note.rotate}deg`,
             }}
@@ -470,6 +444,7 @@ export function StickyNotesLayer() {
           </article>
         );
       })}
-    </div>
+    </div>,
+    document.body,
   );
 }
