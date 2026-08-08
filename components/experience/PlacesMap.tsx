@@ -59,7 +59,7 @@ export function PlacesMap() {
             <button
               type="button"
               onClick={() => setActiveId(null)}
-              className="absolute left-4 top-4 z-[500] rounded-full bg-white/90 px-4 py-2 text-xs uppercase tracking-[0.2em] text-[var(--ink)] shadow-md backdrop-blur-md transition hover:bg-white"
+              className="absolute left-4 top-4 z-[500] hidden rounded-full bg-white/90 px-4 py-2 text-xs uppercase tracking-[0.2em] text-[var(--ink)] shadow-md backdrop-blur-md transition hover:bg-white sm:block"
             >
               Volver al mapa
             </button>
