@@ -14,6 +14,7 @@ import { PlacesMap } from "./PlacesMap";
 import { Reasons } from "./Reasons";
 import { Wishlist } from "./Wishlist";
 import { Countdown } from "./Countdown";
+import { StickyNotes } from "./StickyNotes";
 import { Invitation } from "./Invitation";
 import { Footer } from "./Footer";
 import { AmbientEffects, HeartButton } from "./AmbientEffects";
@@ -81,6 +82,7 @@ function ExperienceInner() {
                   <PlacesMap />
                   <Reasons />
                   <Wishlist />
+                  <StickyNotes />
                   <Countdown />
                   <Footer />
                 </main>

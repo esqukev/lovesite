@@ -29,18 +29,7 @@ const AUDIO_SRC = "/Motzy%20motz.m4a";
 export function SecretFrog({ active }: { active: boolean }) {
   const { lightboxOpen, discoverEgg } = useExperience();
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [hint, setHint] = useState(true);
   const [bubble, setBubble] = useState(false);
-
-  useEffect(() => {
-    if (!active) return;
-    const show = window.setTimeout(() => setHint(true), 1200);
-    const hide = window.setTimeout(() => setHint(false), 3200);
-    return () => {
-      window.clearTimeout(show);
-      window.clearTimeout(hide);
-    };
-  }, [active]);
 
   useEffect(() => {
     audioRef.current = new Audio(AUDIO_SRC);
@@ -59,7 +48,6 @@ export function SecretFrog({ active }: { active: boolean }) {
       detail: "Motzy motz",
     });
     setBubble(true);
-    setHint(false);
     const audio = audioRef.current;
     if (audio) {
       audio.currentTime = 0;
@@ -72,28 +60,29 @@ export function SecretFrog({ active }: { active: boolean }) {
 
   return (
     <div className="fixed bottom-6 right-4 z-[45] flex flex-col items-end sm:bottom-8 sm:right-6">
-      <AnimatePresence>
-        {hint && (
+      <AnimatePresence mode="wait">
+        {bubble ? (
           <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            className="mb-2 rounded-full bg-white/90 px-3 py-1.5 text-[11px] text-[var(--ink)] shadow-md"
-          >
-            Dame click para el sonido secreto
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {bubble && (
-          <motion.div
+            key="bubble"
             initial={{ opacity: 0, y: 8, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -6 }}
             className="speech-bubble mb-2 max-w-[200px] text-center text-sm"
           >
             Motzy motz 🐸
+          </motion.div>
+        ) : (
+          <motion.div
+            key="hint"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: [0.75, 1, 0.75], y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{
+              opacity: { duration: 2.4, repeat: Infinity, ease: "easeInOut" },
+            }}
+            className="mb-2 rounded-full bg-white/95 px-3 py-1.5 text-[11px] text-[var(--ink)] shadow-md ring-1 ring-black/5"
+          >
+            Dame click para el sonido secreto
           </motion.div>
         )}
       </AnimatePresence>

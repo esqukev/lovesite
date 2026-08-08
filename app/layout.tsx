@@ -25,6 +25,9 @@ export const metadata: Metadata = {
   title: "Nuestro pequeño universo",
   description:
     "Un lugar al que solamente dos personas tienen acceso. Hecho para Motzy.",
+  icons: {
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+  },
   openGraph: {
     title: "Nuestro pequeño universo",
     description:
