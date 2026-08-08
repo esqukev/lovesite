@@ -13,37 +13,44 @@ export const VISITOR_ROLE_KEY = "motzy-visitor-role";
 export const DATE_INVITE = {
   label: "Domingo 16",
   title: "Nuestra cita ❤️",
-  startLocal: "20260816T190000",
-  endLocal: "20260816T220000",
-  timeZone: "America/Costa_Rica",
-  details:
-    "Cita oficial. Lugar por decidir. Dress code: Casual / Formal.",
-  location: "Por decidir",
+  /** Apple Calendar file in /public/cita.ics */
+  icsPath: "/cita.ics",
 } as const;
 
-/** Google Calendar “add event” link — she can save the date in one tap */
-export function getDateCalendarUrl() {
-  const params = new URLSearchParams({
-    action: "TEMPLATE",
-    text: DATE_INVITE.title,
-    dates: `${DATE_INVITE.startLocal}/${DATE_INVITE.endLocal}`,
-    ctz: DATE_INVITE.timeZone,
-    details: DATE_INVITE.details,
-    location: DATE_INVITE.location,
-  });
-  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+/**
+ * Número de Motzy en WhatsApp (código país + número, sin + ni espacios).
+ * Ejemplo Costa Rica: 50688887777
+ * Déjalo vacío hasta que lo pongas; si está vacío, WhatsApp abre sin chat fijo.
+ */
+export const MOTZY_WHATSAPP_NUMBER = "";
+
+/** Full https URL to the .ics (Apple Calendar opens this on iPhone) */
+export function getDateCalendarUrl(origin?: string) {
+  const base =
+    origin ??
+    (typeof window !== "undefined" ? window.location.origin : "");
+  return `${base}${DATE_INVITE.icsPath}`;
 }
 
-/** WhatsApp share with the calendar link inside the message */
-export function getDateWhatsAppUrl() {
-  const calendarUrl = getDateCalendarUrl();
+/**
+ * WhatsApp deep link to her number, with the Apple Calendar link in the text.
+ * Format: https://wa.me/506XXXXXXXX?text=...
+ */
+export function getDateWhatsAppUrl(origin?: string) {
+  const calendarUrl = getDateCalendarUrl(origin);
   const text = [
     "Acepté nuestra cita del domingo 16 ❤️",
     "",
-    "Toca este link para guardarla en el calendario:",
+    "Toca este link para guardarla en tu calendario de Apple:",
     calendarUrl,
   ].join("\n");
-  return `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+
+  const encoded = encodeURIComponent(text);
+  const phone = MOTZY_WHATSAPP_NUMBER.replace(/\D/g, "");
+  if (phone) {
+    return `https://wa.me/${phone}?text=${encoded}`;
+  }
+  return `https://api.whatsapp.com/send?text=${encoded}`;
 }
 
 export const WELCOME_LETTER = `Si estás viendo esto, es porque encontraste la llave de nuestro pequeño universo.

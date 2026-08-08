@@ -64,12 +64,12 @@ export function Invitation({ active }: { active: boolean }) {
 
   const afterFrost = () => {
     setShowFrost(false);
-    // 1) Calendar so she can mark the day
+    // Apple Calendar (.ics) — on iPhone asks to add the event
     window.open(getDateCalendarUrl(), "_blank", "noopener,noreferrer");
-    // 2) WhatsApp with the same calendar link (she can send it / keep it)
+    // WhatsApp chat (MOTZY_WHATSAPP_NUMBER) with the calendar link in the text
     window.setTimeout(() => {
       window.open(getDateWhatsAppUrl(), "_blank", "noopener,noreferrer");
-    }, 350);
+    }, 500);
   };
 
   const dodge = () => {
