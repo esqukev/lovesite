@@ -164,13 +164,14 @@ export function StackedMemories() {
           </div>
         </div>
 
+        {/* Mobile: park critters in corners so they don't sit on the copy */}
         <MiniCritter
           kind="frog"
-          className="absolute right-[22%] top-[28%] hidden h-10 w-10 text-[#7a9e6a] opacity-80 sm:block lg:right-[28%]"
+          className="absolute right-3 top-5 h-8 w-8 text-[#7a9e6a] opacity-70 sm:right-[22%] sm:top-[28%] sm:h-10 sm:w-10 sm:opacity-80 lg:right-[28%]"
         />
         <MiniCritter
           kind="cat"
-          className="absolute right-[14%] top-[55%] hidden h-11 w-11 text-[var(--accent)] opacity-80 sm:block"
+          className="absolute bottom-5 right-3 h-9 w-9 text-[var(--accent)] opacity-70 sm:bottom-auto sm:right-[14%] sm:top-[55%] sm:h-11 sm:w-11 sm:opacity-80"
         />
         <MiniCritter
           kind="dog"
@@ -178,7 +179,7 @@ export function StackedMemories() {
         />
         <MiniCritter
           kind="frog"
-          className="absolute bottom-[28%] left-[12%] hidden h-9 w-9 text-[#7a9e6a] opacity-70 sm:block"
+          className="absolute left-3 top-5 h-7 w-7 text-[#7a9e6a] opacity-60 sm:bottom-[28%] sm:left-[12%] sm:top-auto sm:h-9 sm:w-9 sm:opacity-70"
         />
       </div>
 

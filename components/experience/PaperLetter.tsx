@@ -16,15 +16,24 @@ export function PaperLetter({ onStart }: { onStart: () => void }) {
   const [done, setDone] = useState(false);
 
   useEffect(() => {
-    gsap.from(".paper-shell", {
-      y: 36,
-      opacity: 0,
-      duration: 0.75,
-      ease: "power3.out",
-    });
+    const shell = rootRef.current?.querySelector(".paper-shell");
+    if (!shell) return;
+    gsap.fromTo(
+      shell,
+      { y: 28, opacity: 0 },
+      {
+        y: 0,
+        opacity: 1,
+        duration: 0.7,
+        ease: "power3.out",
+        // Transforms on parents break iOS hit-testing — clear when done
+        clearProps: "transform",
+      },
+    );
   }, []);
 
   useEffect(() => {
+    if (open) return;
     const root = rainRef.current;
     if (!root) return;
     let alive = true;
@@ -34,6 +43,8 @@ export function PaperLetter({ onStart }: { onStart: () => void }) {
       if (!alive) return;
       const heart = document.createElement("span");
       heart.className = "float-heart";
+      heart.setAttribute("aria-hidden", "true");
+      heart.style.pointerEvents = "none";
       heart.textContent = HEARTS[Math.floor(Math.random() * HEARTS.length)];
       heart.style.left = `${6 + Math.random() * 88}%`;
       heart.style.top = "-6%";
@@ -64,12 +75,12 @@ export function PaperLetter({ onStart }: { onStart: () => void }) {
       window.clearTimeout(timeout);
       root.innerHTML = "";
     };
-  }, []);
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
     let i = 0;
-    const step = window.matchMedia("(pointer: coarse)").matches ? 3 : 1;
+    const step = window.matchMedia("(pointer: coarse)").matches ? 4 : 1;
     const id = window.setInterval(() => {
       i = Math.min(WELCOME_LETTER.length, i + step);
       setDisplayed(WELCOME_LETTER.slice(0, i));
@@ -77,7 +88,7 @@ export function PaperLetter({ onStart }: { onStart: () => void }) {
         window.clearInterval(id);
         setDone(true);
       }
-    }, 16);
+    }, 14);
     return () => window.clearInterval(id);
   }, [open]);
 
@@ -90,24 +101,17 @@ export function PaperLetter({ onStart }: { onStart: () => void }) {
   useEffect(() => {
     if (!open) return;
     const sheet = rootRef.current?.querySelector(".paper-sheet");
-    const flap = rootRef.current?.querySelector(".envelope-flap");
-    if (flap) {
-      gsap.fromTo(
-        flap,
-        { rotateX: 0 },
-        {
-          rotateX: 180,
-          duration: 0.45,
-          ease: "power2.inOut",
-          transformOrigin: "top center",
-        },
-      );
-    }
     if (sheet) {
       gsap.fromTo(
         sheet,
-        { y: 16, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.4, ease: "power3.out" },
+        { y: 12, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.35,
+          ease: "power3.out",
+          clearProps: "transform",
+        },
       );
     }
   }, [open]);
@@ -115,13 +119,7 @@ export function PaperLetter({ onStart }: { onStart: () => void }) {
   const start = () => {
     if (!done || startedRef.current) return;
     startedRef.current = true;
-    // Enter immediately — short fade so mobile doesn't feel laggy
     onStart();
-    gsap.to(rootRef.current, {
-      opacity: 0,
-      duration: 0.35,
-      ease: "power2.out",
-    });
   };
 
   return (
@@ -130,11 +128,13 @@ export function PaperLetter({ onStart }: { onStart: () => void }) {
       className="fixed inset-0 z-40 overflow-y-auto overscroll-contain bg-[#f3e8ea]"
     >
       <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_at_top,rgba(232,170,176,0.45),transparent_50%),radial-gradient(ellipse_at_bottom,rgba(255,214,188,0.35),transparent_55%)]" />
-      <div
-        ref={rainRef}
-        className="letter-heart-rain pointer-events-none fixed inset-0 z-[1] overflow-hidden"
-        aria-hidden
-      />
+      {!open && (
+        <div
+          ref={rainRef}
+          className="letter-heart-rain pointer-events-none fixed inset-0 z-[1] overflow-hidden"
+          aria-hidden
+        />
+      )}
 
       <div className="relative z-[2] flex min-h-full items-start justify-center px-4 py-8 sm:items-center sm:py-12">
         <div className="paper-shell w-full max-w-lg">
@@ -143,36 +143,30 @@ export function PaperLetter({ onStart }: { onStart: () => void }) {
           </h2>
 
           {!open && (
-            <button
-              type="button"
-              onClick={openLetter}
-              className="group relative mx-auto block w-full max-w-md touch-manipulation [-webkit-tap-highlight-color:transparent]"
-              aria-label="Abrir carta"
-            >
-              <div
-                className="relative h-56 overflow-hidden rounded-sm bg-[#c9a27a] shadow-[0_30px_80px_rgba(0,0,0,0.45)]"
-                style={{ perspective: 900 }}
+            <div className="mx-auto w-full max-w-md">
+              {/* Flat hit target — no 3D / perspective (breaks taps on iOS) */}
+              <button
+                type="button"
+                onClick={openLetter}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  openLetter();
+                }}
+                className="relative block w-full touch-manipulation select-none [-webkit-tap-highlight-color:transparent]"
+                aria-label="Abrir carta"
               >
-                <div
-                  className="envelope-flap pointer-events-none absolute inset-x-0 top-0 z-[1] h-28 origin-top bg-[#d4b08a]"
-                  aria-hidden
-                />
-                <div
-                  className="pointer-events-none absolute inset-x-8 bottom-8 top-16 rounded-sm bg-[#f7efe3] opacity-90 shadow-inner"
-                  aria-hidden
-                />
-                <div
-                  className="pointer-events-none absolute bottom-6 left-1/2 z-[1] flex h-14 w-14 -translate-x-1/2 items-center justify-center rounded-full bg-[var(--accent)] font-display text-lg text-[var(--ink)] shadow-lg transition group-hover:scale-105"
-                  aria-hidden
-                >
-                  ♥
-                </div>
-                <span className="absolute inset-0 z-10" aria-hidden />
-              </div>
+                <span className="pointer-events-none relative block h-56 overflow-hidden rounded-sm bg-[#c9a27a] shadow-[0_30px_80px_rgba(0,0,0,0.45)]">
+                  <span className="absolute inset-x-0 top-0 h-28 bg-[#d4b08a]" />
+                  <span className="absolute inset-x-8 bottom-8 top-16 rounded-sm bg-[#f7efe3] opacity-90 shadow-inner" />
+                  <span className="absolute bottom-6 left-1/2 flex h-14 w-14 -translate-x-1/2 items-center justify-center rounded-full bg-[var(--accent)] font-display text-lg text-[var(--ink)] shadow-lg">
+                    ♥
+                  </span>
+                </span>
+              </button>
               <p className="mt-4 text-center text-sm text-[var(--ink)]/50">
                 Toca el sobre para abrirla
               </p>
-            </button>
+            </div>
           )}
 
           {open && (
@@ -186,25 +180,24 @@ export function PaperLetter({ onStart }: { onStart: () => void }) {
                   )}
                 </p>
 
-                <div
-                  className={`relative z-20 mt-8 flex justify-center transition-all duration-500 sm:mt-9 ${
-                    done
-                      ? "translate-y-0 opacity-100"
-                      : "pointer-events-none translate-y-3 opacity-0"
-                  }`}
-                >
-                  <button
-                    type="button"
-                    disabled={!done}
-                    onClick={start}
-                    className="letter-seal-btn group relative z-20 min-h-12 min-w-[10rem] touch-manipulation [-webkit-tap-highlight-color:transparent]"
-                  >
-                    <span className="letter-seal-glow pointer-events-none" aria-hidden />
-                    <span className="relative z-[1] px-10 py-3.5 font-display text-xl tracking-wide text-[#f7efe6]">
-                      Entrar
-                    </span>
-                  </button>
-                </div>
+                {done && (
+                  <div className="relative z-30 mt-8 flex justify-center sm:mt-9">
+                    <button
+                      type="button"
+                      onClick={start}
+                      onTouchEnd={(e) => {
+                        e.preventDefault();
+                        start();
+                      }}
+                      className="letter-seal-btn relative min-h-[52px] min-w-[11rem] touch-manipulation select-none [-webkit-tap-highlight-color:transparent]"
+                    >
+                      <span className="letter-seal-glow" aria-hidden />
+                      <span className="relative z-[1] px-10 py-3.5 font-display text-xl tracking-wide text-[#f7efe6]">
+                        Entrar
+                      </span>
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           )}
