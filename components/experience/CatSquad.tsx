@@ -18,12 +18,12 @@ const CAT_LINES = [
 type Spot = { top: string; left?: string; right?: string; side: "left" | "right" };
 
 const SPOTS: Spot[] = [
-  { top: "18%", left: "4%", side: "left" },
-  { top: "32%", right: "5%", side: "right" },
-  { top: "58%", left: "6%", side: "left" },
-  { top: "72%", right: "4%", side: "right" },
-  { top: "48%", right: "18%", side: "right" },
-  { top: "78%", left: "28%", side: "left" },
+  { top: "16%", left: "3%", side: "left" },
+  { top: "28%", right: "3%", side: "right" },
+  { top: "52%", left: "4%", side: "left" },
+  { top: "66%", right: "4%", side: "right" },
+  { top: "40%", right: "12%", side: "right" },
+  { top: "74%", left: "14%", side: "left" },
 ];
 
 function CatSvg({ className }: { className?: string }) {
@@ -78,15 +78,13 @@ type CatInstance = {
 };
 
 export function CatSquad({ active }: { active: boolean }) {
-  const { discoverEgg, lightboxOpen } = useExperience();
+  const { discoverEgg, lightboxOpen, inviteOpen } = useExperience();
   const catRef = useRef<HTMLButtonElement>(null);
   const bubbleRef = useRef<HTMLDivElement>(null);
   const [cat, setCat] = useState<CatInstance | null>(null);
   const [bubble, setBubble] = useState<Bubble | null>(null);
-  const [clickHint, setClickHint] = useState(false);
   const hideTimer = useRef<number | null>(null);
   const cycleTimer = useRef<number | null>(null);
-  const hintTimer = useRef<number | null>(null);
   const usedSpots = useRef<number[]>([]);
   const idRef = useRef(0);
   const busy = useRef(false);
@@ -111,49 +109,46 @@ export function CatSquad({ active }: { active: boolean }) {
       spotIndex: pickSpot(),
       tint: Math.random() > 0.5 ? "accent" : "gold",
     });
-    setClickHint(true);
-    if (hintTimer.current) window.clearTimeout(hintTimer.current);
-    hintTimer.current = window.setTimeout(() => setClickHint(false), 1800);
   }, [pickSpot]);
 
   const closePopupAndCat = useCallback(() => {
     if (hideTimer.current) window.clearTimeout(hideTimer.current);
     hideTimer.current = null;
-    if (hintTimer.current) window.clearTimeout(hintTimer.current);
-    setClickHint(false);
     setBubble(null);
     setCat(null);
     busy.current = false;
   }, []);
 
   useEffect(() => {
-    if (!active) {
+    if (!active || lightboxOpen || inviteOpen) {
       closePopupAndCat();
+      if (cycleTimer.current) window.clearTimeout(cycleTimer.current);
       return;
     }
 
     let cancelled = false;
 
-    const scheduleHide = (delay: number) => {
+    const scheduleNext = (delay: number) => {
       if (cycleTimer.current) window.clearTimeout(cycleTimer.current);
       cycleTimer.current = window.setTimeout(() => {
-        if (cancelled || busy.current) {
-          scheduleHide(600);
+        if (cancelled) return;
+        if (busy.current) {
+          scheduleNext(800);
           return;
         }
         setCat(null);
         cycleTimer.current = window.setTimeout(() => {
           if (cancelled) return;
           spawn();
-          scheduleHide(6000 + Math.random() * 4000);
-        }, 2000 + Math.random() * 2000);
+          scheduleNext(7000 + Math.random() * 5000);
+        }, 1400 + Math.random() * 1200);
       }, delay);
     };
 
     const first = window.setTimeout(() => {
       spawn();
-      scheduleHide(6000 + Math.random() * 4000);
-    }, 2800);
+      scheduleNext(8000 + Math.random() * 4000);
+    }, 1200);
 
     return () => {
       cancelled = true;
@@ -161,7 +156,7 @@ export function CatSquad({ active }: { active: boolean }) {
       if (cycleTimer.current) window.clearTimeout(cycleTimer.current);
       if (hideTimer.current) window.clearTimeout(hideTimer.current);
     };
-  }, [active, spawn, closePopupAndCat]);
+  }, [active, lightboxOpen, inviteOpen, spawn, closePopupAndCat]);
 
   useEffect(() => {
     const el = catRef.current;
@@ -224,16 +219,21 @@ export function CatSquad({ active }: { active: boolean }) {
     gsap.fromTo(
       el.querySelector("svg"),
       { scale: 1 },
-      { scale: 1.15, duration: 0.14, yoyo: true, repeat: 1, transformOrigin: "50% 50%" },
+      {
+        scale: 1.15,
+        duration: 0.14,
+        yoyo: true,
+        repeat: 1,
+        transformOrigin: "50% 50%",
+      },
     );
 
-    // Popup 3s → then cat leaves with the popup
     hideTimer.current = window.setTimeout(() => {
       closePopupAndCat();
     }, 3000);
   };
 
-  if (!active || lightboxOpen) return null;
+  if (!active || lightboxOpen || inviteOpen) return null;
   const spot = cat ? SPOTS[cat.spotIndex] : null;
 
   return (
@@ -245,20 +245,28 @@ export function CatSquad({ active }: { active: boolean }) {
             initial={{ opacity: 0 }}
             exit={{ opacity: 0, scale: 0.7, y: 10 }}
             transition={{ duration: 0.3 }}
-            className="fixed z-[46]"
+            className="fixed z-[58]"
             style={{
               top: spot.top,
               left: spot.left,
               right: spot.right,
             }}
           >
+            {/* Hint stays while the cat is visible (until popup opens) */}
             <AnimatePresence>
-              {clickHint && !bubble && (
+              {!bubble && (
                 <motion.div
                   initial={{ opacity: 0, y: 6 }}
-                  animate={{ opacity: 1, y: 0 }}
+                  animate={{ opacity: [0.75, 1, 0.75], y: 0 }}
                   exit={{ opacity: 0, y: -4 }}
-                  className="absolute bottom-full left-1/2 mb-1 -translate-x-1/2 whitespace-nowrap rounded-full bg-white/95 px-2.5 py-1 text-[10px] font-medium text-[var(--ink)] shadow-md"
+                  transition={{
+                    opacity: {
+                      duration: 2.2,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    },
+                  }}
+                  className="absolute bottom-full left-1/2 mb-1 -translate-x-1/2 whitespace-nowrap rounded-full bg-white/95 px-2.5 py-1 text-[10px] font-medium text-[var(--ink)] shadow-md ring-1 ring-black/5"
                 >
                   Dame click
                 </motion.div>
@@ -270,8 +278,10 @@ export function CatSquad({ active }: { active: boolean }) {
               aria-label="Gatito escondido"
               data-cursor="hover"
               onClick={meow}
-              className={`touch-manipulation rounded-full p-2 drop-shadow-[0_8px_24px_rgba(232,180,184,0.4)] ${
-                cat.tint === "accent" ? "text-[var(--accent)]" : "text-[var(--gold)]"
+              className={`touch-manipulation rounded-full p-2 drop-shadow-[0_8px_24px_rgba(232,180,184,0.55)] ${
+                cat.tint === "accent"
+                  ? "text-[var(--accent)]"
+                  : "text-[var(--gold)]"
               }`}
             >
               <CatSvg className="h-12 w-12 sm:h-14 sm:w-14" />

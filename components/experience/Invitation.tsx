@@ -23,7 +23,14 @@ export function Invitation({ active }: { active: boolean }) {
   const noRef = useRef<HTMLButtonElement>(null);
   const triggered = useRef(false);
 
-  const canInvite = visitorRole === "guest" && !inviteAccepted;
+  // guest (motzy) y owner (kevin, para pruebas) pueden verla si no está aceptada
+  const canInvite =
+    (visitorRole === "guest" || visitorRole === "owner") && !inviteAccepted;
+
+  useEffect(() => {
+    // Al cambiar de rol / reset, permitir disparar de nuevo
+    triggered.current = false;
+  }, [visitorRole, inviteAccepted]);
 
   useEffect(() => {
     if (!active || !canInvite || triggered.current) return;
@@ -31,25 +38,27 @@ export function Invitation({ active }: { active: boolean }) {
     const onScroll = () => {
       const max = document.documentElement.scrollHeight - window.innerHeight;
       const progress = max > 0 ? window.scrollY / max : 0;
-      if (progress >= 0.7) {
+      if (progress >= 0.55) {
         triggered.current = true;
         setInviteOpen(true);
       }
     };
 
+    // Kevin/pruebas: sale más pronto; Motzy: también por scroll o a los 45s
     const timer = window.setTimeout(() => {
       if (!triggered.current && canInvite) {
         triggered.current = true;
         setInviteOpen(true);
       }
-    }, 60_000);
+    }, visitorRole === "owner" ? 8_000 : 45_000);
 
     window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
     return () => {
       window.clearTimeout(timer);
       window.removeEventListener("scroll", onScroll);
     };
-  }, [active, canInvite, setInviteOpen]);
+  }, [active, canInvite, visitorRole, setInviteOpen]);
 
   const accept = () => {
     // Cierra el popup pero aún no persiste: se guarda al enviar WhatsApp

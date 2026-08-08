@@ -85,7 +85,7 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
       /* private mode */
     }
 
-    // Entrar como kevin reactiva la invitación para poder probar de nuevo con motzy
+    // Entrar como kevin siempre reactiva la invitación (modo prueba)
     if (role === "owner") {
       setInviteAccepted(false);
       setInviteOpen(false);
