@@ -80,18 +80,18 @@ export function Hero() {
         </p>
         <h1
           ref={titleRef}
-          className="hero-big max-w-[12ch] font-display text-[clamp(3.2rem,12vw,8rem)] leading-[0.9] tracking-[-0.04em] text-[var(--ink)]"
+          className="hero-big relative max-w-[12ch] font-display text-[clamp(3.2rem,12vw,8rem)] leading-[0.9] tracking-[-0.04em] text-[var(--ink)]"
           onPointerDown={onHoldStart}
           onPointerUp={onHoldEnd}
           onPointerLeave={onHoldEnd}
           data-cursor="hover"
         >
           Nuestra pequeña esquina del universo
-          <span className="secret-msg mt-6 block font-sans text-base font-normal tracking-normal text-[var(--accent)] opacity-0 sm:text-lg">
+          <span className="secret-msg absolute left-0 top-full mt-3 block font-sans text-base font-normal tracking-normal text-[var(--accent)] opacity-0 sm:text-lg">
             Si sostienes esto, es porque ya sabes que eres mi hogar.
           </span>
         </h1>
-        <p className="hero-big muted mt-8 max-w-md text-base sm:text-lg">
+        <p className="hero-big muted mt-14 max-w-md text-base sm:mt-16 sm:text-lg">
           Este lugar existe únicamente para nosotros. Baja. Toca. Quédate.
         </p>
       </div>

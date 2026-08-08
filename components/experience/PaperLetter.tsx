@@ -4,8 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { WELCOME_LETTER } from "@/lib/data";
 
+const HEARTS = ["♡", "♥", "♡", "♥"];
+
 export function PaperLetter({ onStart }: { onStart: () => void }) {
   const rootRef = useRef<HTMLDivElement>(null);
+  const rainRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const [displayed, setDisplayed] = useState("");
   const [done, setDone] = useState(false);
@@ -18,6 +21,49 @@ export function PaperLetter({ onStart }: { onStart: () => void }) {
       duration: 1.1,
       ease: "power3.out",
     });
+  }, []);
+
+  // Subtle heart rain while the letter screen is up
+  useEffect(() => {
+    const root = rainRef.current;
+    if (!root) return;
+    let alive = true;
+    let timeout: number;
+
+    const spawn = () => {
+      if (!alive) return;
+      const heart = document.createElement("span");
+      heart.className = "float-heart";
+      heart.textContent = HEARTS[Math.floor(Math.random() * HEARTS.length)];
+      heart.style.left = `${6 + Math.random() * 88}%`;
+      heart.style.top = "-6%";
+      heart.style.fontSize = `${10 + Math.random() * 12}px`;
+      heart.style.opacity = "0.55";
+      root.appendChild(heart);
+
+      gsap.fromTo(
+        heart,
+        { y: 0, x: 0, opacity: 0.5 + Math.random() * 0.25, rotation: 0 },
+        {
+          y: window.innerHeight * (0.85 + Math.random() * 0.25),
+          x: (Math.random() - 0.5) * 80,
+          opacity: 0,
+          rotation: (Math.random() - 0.5) * 40,
+          duration: 8 + Math.random() * 5,
+          ease: "sine.in",
+          onComplete: () => heart.remove(),
+        },
+      );
+
+      timeout = window.setTimeout(spawn, 520 + Math.random() * 900);
+    };
+
+    timeout = window.setTimeout(spawn, 400);
+    return () => {
+      alive = false;
+      window.clearTimeout(timeout);
+      root.innerHTML = "";
+    };
   }, []);
 
   useEffect(() => {
@@ -70,8 +116,13 @@ export function PaperLetter({ onStart }: { onStart: () => void }) {
       style={{ perspective: 1200 }}
     >
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(232,170,176,0.45),transparent_50%),radial-gradient(ellipse_at_bottom,rgba(255,214,188,0.35),transparent_55%)]" />
+      <div
+        ref={rainRef}
+        className="letter-heart-rain pointer-events-none absolute inset-0 z-[1] overflow-hidden"
+        aria-hidden
+      />
 
-      <div className="paper-shell relative w-full max-w-lg" style={{ transformStyle: "preserve-3d" }}>
+      <div className="paper-shell relative z-[2] w-full max-w-lg" style={{ transformStyle: "preserve-3d" }}>
         <h2 className="mb-6 text-center font-display text-[clamp(1.85rem,5vw,2.6rem)] italic leading-tight tracking-[-0.02em] text-[var(--ink)]">
           Una carta para mi amor
         </h2>

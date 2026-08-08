@@ -143,20 +143,15 @@ body {
   pointer-events: none;
 }
 
-.custom-cursor,
-.custom-cursor * {
-  cursor: none !important;
-}
-
 .cursor-heart {
   position: fixed;
   top: 0;
   left: 0;
-  width: 28px;
-  height: 26px;
+  width: 34px;
+  height: 32px;
   pointer-events: none !important;
   z-index: 2147483000;
-  filter: drop-shadow(0 3px 8px rgba(200, 107, 120, 0.45));
+  filter: drop-shadow(0 3px 10px rgba(200, 107, 120, 0.5));
   will-change: transform;
 }
 
@@ -167,24 +162,38 @@ body {
 }
 
 .sticky-note {
-  position: relative;
-  padding: 1.35rem 1rem 1.1rem;
+  position: absolute;
+  width: min(168px, 42vw);
+  padding: 1.45rem 1rem 1.15rem;
   border-radius: 3px 3px 10px 4px;
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.55) inset,
     0 10px 22px rgba(42, 28, 34, 0.12),
     0 2px 4px rgba(42, 28, 34, 0.08);
   transform: rotate(var(--note-rotate, 0deg));
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  touch-action: none;
+  user-select: none;
+  cursor: grab;
 }
 
-.sticky-note:hover {
-  transform: rotate(0deg) scale(1.04);
+.sticky-note:active {
+  cursor: grabbing;
+}
+
+.sticky-note.is-dragging {
+  transform: rotate(0deg) scale(1.05);
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.6) inset,
-    0 16px 28px rgba(42, 28, 34, 0.16),
-    0 4px 8px rgba(42, 28, 34, 0.1);
-  z-index: 4;
+    0 18px 32px rgba(42, 28, 34, 0.18),
+    0 4px 10px rgba(42, 28, 34, 0.12);
+  z-index: 20 !important;
+}
+
+.sticky-note.is-editing {
+  cursor: text;
+  user-select: text;
+  transform: rotate(0deg);
+  z-index: 21 !important;
 }
 
 .sticky-note::after {
@@ -212,6 +221,12 @@ body {
   border: 1px solid rgba(42, 28, 34, 0.08);
   box-shadow: 0 1px 2px rgba(42, 28, 34, 0.08);
   transform: rotate(-2deg);
+  pointer-events: none;
+}
+
+.letter-heart-rain .float-heart {
+  color: rgba(200, 107, 120, 0.42);
+  filter: drop-shadow(0 0 6px rgba(232, 180, 184, 0.25));
 }
 
 .speech-bubble p {

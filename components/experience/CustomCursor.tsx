@@ -35,14 +35,15 @@ export function CustomCursor({ active }: { active: boolean }) {
     const heart = heartRef.current;
     if (!heart) return;
 
-    document.documentElement.classList.add("custom-cursor");
-    gsap.set(heart, { xPercent: -50, yPercent: -50, opacity: 1 });
+    // Keep the normal system cursor; heart rides beside it.
+    document.documentElement.classList.add("heart-cursor-active");
+    gsap.set(heart, { opacity: 1 });
 
     const move = (e: MouseEvent) => {
       gsap.to(heart, {
-        x: e.clientX,
-        y: e.clientY,
-        duration: 0.18,
+        x: e.clientX + 14,
+        y: e.clientY + 16,
+        duration: 0.16,
         ease: "power3.out",
       });
     };
@@ -53,8 +54,8 @@ export function CustomCursor({ active }: { active: boolean }) {
         "a, button, input, textarea, [data-cursor='hover']",
       );
       gsap.to(heart, {
-        scale: interactive ? 1.35 : 1,
-        duration: 0.22,
+        scale: interactive ? 1.28 : 1,
+        duration: 0.2,
         ease: "power2.out",
       });
     };
@@ -63,7 +64,7 @@ export function CustomCursor({ active }: { active: boolean }) {
     window.addEventListener("mouseover", over);
 
     return () => {
-      document.documentElement.classList.remove("custom-cursor");
+      document.documentElement.classList.remove("heart-cursor-active");
       window.removeEventListener("mousemove", move);
       window.removeEventListener("mouseover", over);
     };
