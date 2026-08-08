@@ -3,7 +3,7 @@
 import { FormEvent, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
-import { GATE_PASSWORDS, type VisitorRole } from "@/lib/data";
+import { GATE_KEY_STORAGE, GATE_PASSWORDS, type VisitorRole } from "@/lib/data";
 
 gsap.registerPlugin(useGSAP);
 
@@ -67,6 +67,12 @@ export function Gate({
     setError(false);
     setRole(nextRole);
     setStatus("ok");
+
+    try {
+      sessionStorage.setItem(GATE_KEY_STORAGE, key);
+    } catch {
+      /* private mode */
+    }
 
     const tl = gsap.timeline({
       onComplete: () => {

@@ -6,6 +6,9 @@ export const GATE_PASSWORDS: Record<string, VisitorRole> = {
   kevin: "owner",
 };
 
+/** sessionStorage key for the gate password (used to authorize photo uploads) */
+export const GATE_KEY_STORAGE = "motzy-gate-key";
+
 export const INVITE_ACCEPTED_KEY = "motzy-date-invite-accepted";
 /** Kevin: la invitación de prueba solo una vez por navegador */
 export const OWNER_INVITE_SEEN_KEY = "motzy-owner-invite-seen";
