@@ -6,6 +6,7 @@ import { PLACES } from "@/lib/data";
 import { MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SectionPolaroid } from "./SectionPolaroid";
+import { SectionReveal } from "./SectionReveal";
 
 const MapInner = dynamic(() => import("./PlacesMapInner"), {
   ssr: false,
@@ -30,17 +31,23 @@ export function PlacesMap() {
         rotate="7deg"
       />
       <div className="relative z-10 mx-auto max-w-6xl">
-        <div className="mb-10 max-w-xl">
-          <p className="mb-3 text-xs uppercase tracking-[0.35em] text-[var(--gold)]">
+        <SectionReveal className="mb-10 max-w-xl">
+          <p
+            data-reveal
+            className="mb-3 text-xs uppercase tracking-[0.35em] text-[var(--gold)]"
+          >
             Lugares
           </p>
-          <h2 className="font-display text-4xl text-[var(--ink)] sm:text-5xl">
+          <h2
+            data-reveal
+            className="font-display text-4xl text-[var(--ink)] sm:text-5xl"
+          >
             Nuestro mapa
           </h2>
-          <p className="muted mt-4">
+          <p data-reveal className="muted mt-4">
             Cada punto tiene su descripción. Dale click para leerla.
           </p>
-        </div>
+        </SectionReveal>
 
         <div className="relative overflow-hidden rounded-[1.5rem] shadow-[0_30px_80px_-40px_rgba(42,28,34,0.35)] ring-1 ring-[var(--line)]">
           <MapInner
@@ -69,10 +76,10 @@ export function PlacesMap() {
                   setActiveId((prev) => (prev === place.id ? null : place.id))
                 }
                 className={cn(
-                  "flex w-full items-start gap-2 rounded-2xl px-3 py-3 text-left transition-all",
+                  "flex w-full origin-center items-start gap-2 rounded-2xl px-3 py-3 text-left transition-all duration-300 ease-in-out will-change-transform hover:scale-[1.04] hover:bg-white/50",
                   activeId === place.id
-                    ? "bg-[var(--accent)]/15"
-                    : "hover:bg-white/40",
+                    ? "scale-[1.03] bg-[var(--accent)]/15"
+                    : "",
                 )}
               >
                 <MapPin

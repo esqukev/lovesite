@@ -10,6 +10,7 @@ import { WISHLIST } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import { useExperience } from "./ExperienceProvider";
 import { SectionPolaroid } from "./SectionPolaroid";
+import { SectionReveal } from "./SectionReveal";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -151,21 +152,30 @@ export function Wishlist() {
         rotate="7deg"
       />
       <div className="relative z-10 mx-auto max-w-2xl">
-        <div className="mb-10 text-center">
-          <p className="mb-3 text-xs uppercase tracking-[0.35em] text-[var(--gold)]">
+        <SectionReveal className="mb-10 text-center">
+          <p
+            data-reveal
+            className="mb-3 text-xs uppercase tracking-[0.35em] text-[var(--gold)]"
+          >
             Cosas por hacer
           </p>
-          <h2 className="font-display text-4xl text-[var(--ink)] sm:text-5xl">
+          <h2
+            data-reveal
+            className="font-display text-4xl text-[var(--ink)] sm:text-5xl"
+          >
             Lo que todavía nos falta
           </h2>
-          <p className="muted mx-auto mt-4 max-w-md">
+          <p data-reveal className="muted mx-auto mt-4 max-w-md">
             Márcalo cuando lo vivamos. Lo que añadas o marques se guarda en este
             dispositivo y sigue ahí la próxima vez.
           </p>
-          <p className="mt-5 font-display text-lg italic text-[var(--accent)]">
+          <p
+            data-reveal
+            className="mt-5 font-display text-lg italic text-[var(--accent)]"
+          >
             {ready ? `${doneCount} de ${items.length}` : "…"}
           </p>
-        </div>
+        </SectionReveal>
 
         <form
           onSubmit={addItem}

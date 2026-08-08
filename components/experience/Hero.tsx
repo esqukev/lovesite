@@ -17,7 +17,7 @@ export function Hero() {
 
   useGSAP(
     () => {
-      gsap.from(".hero-big", {
+      gsap.from(".hero-line", {
         yPercent: 30,
         opacity: 0,
         duration: 1.4,
@@ -35,8 +35,9 @@ export function Hero() {
         delay: 0.3,
       });
 
-      gsap.to(".hero-big", {
-        yPercent: -16,
+      // One shared parallax so title + subtitle keep their spacing
+      gsap.to(".hero-parallax", {
+        yPercent: -12,
         ease: "none",
         scrollTrigger: {
           trigger: rootRef.current,
@@ -74,24 +75,24 @@ export function Hero() {
     >
       <AccentPolaroids />
 
-      <div className="relative z-10 w-full max-w-6xl">
-        <p className="hero-big mb-4 text-xs uppercase tracking-[0.4em] text-[var(--gold)]">
+      <div className="hero-parallax relative z-10 w-full max-w-6xl">
+        <p className="hero-line mb-4 text-xs uppercase tracking-[0.4em] text-[var(--gold)]">
           Solo nosotros
         </p>
         <h1
           ref={titleRef}
-          className="hero-big relative max-w-[12ch] font-display text-[clamp(3.2rem,12vw,8rem)] leading-[0.9] tracking-[-0.04em] text-[var(--ink)]"
+          className="hero-line relative max-w-[12ch] pb-[0.22em] font-display text-[clamp(3.2rem,12vw,8rem)] leading-[0.92] tracking-[-0.04em] text-[var(--ink)]"
           onPointerDown={onHoldStart}
           onPointerUp={onHoldEnd}
           onPointerLeave={onHoldEnd}
           data-cursor="hover"
         >
           Nuestra pequeña esquina del universo
-          <span className="secret-msg absolute left-0 top-full mt-3 block font-sans text-base font-normal tracking-normal text-[var(--accent)] opacity-0 sm:text-lg">
+          <span className="secret-msg pointer-events-none absolute left-0 top-[calc(100%+0.4em)] block font-sans text-base font-normal tracking-normal text-[var(--accent)] opacity-0 sm:text-lg">
             Si sostienes esto, es porque ya sabes que eres mi hogar.
           </span>
         </h1>
-        <p className="hero-big muted mt-14 max-w-md text-base sm:mt-16 sm:text-lg">
+        <p className="hero-line muted mt-12 max-w-md text-base sm:mt-14 sm:text-lg">
           Este lugar existe únicamente para nosotros. Baja. Toca. Quédate.
         </p>
       </div>

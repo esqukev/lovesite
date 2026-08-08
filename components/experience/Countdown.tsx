@@ -6,6 +6,7 @@ import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SectionPolaroid } from "./SectionPolaroid";
+import { SectionReveal } from "./SectionReveal";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -128,15 +129,24 @@ export function Countdown() {
         rotate="8deg"
       />
       <div className="relative z-10 mx-auto max-w-5xl text-center">
-        <p className="mb-3 text-xs uppercase tracking-[0.35em] text-[var(--gold)]">
-          Contador
-        </p>
-        <h2 className="font-display text-4xl text-[var(--ink)] sm:text-5xl">
-          Próximo 23 de junio
-        </h2>
-        <p className="muted mx-auto mt-4 max-w-lg">
-          Un día marcado. El tiempo avanza… y yo solo quiero llegar ahí contigo.
-        </p>
+        <SectionReveal>
+          <p
+            data-reveal
+            className="mb-3 text-xs uppercase tracking-[0.35em] text-[var(--gold)]"
+          >
+            Contador
+          </p>
+          <h2
+            data-reveal
+            className="font-display text-4xl text-[var(--ink)] sm:text-5xl"
+          >
+            Próximo 23 de junio
+          </h2>
+          <p data-reveal className="muted mx-auto mt-4 max-w-lg">
+            Un día marcado. El tiempo avanza… y yo solo quiero llegar ahí
+            contigo.
+          </p>
+        </SectionReveal>
 
         <div className="mt-14 flex flex-wrap items-end justify-center gap-y-8">
           {UNITS.map((unit, i) => (

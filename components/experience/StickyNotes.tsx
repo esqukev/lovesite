@@ -16,6 +16,7 @@ import { createPortal } from "react-dom";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useExperience } from "./ExperienceProvider";
+import { SectionReveal } from "./SectionReveal";
 
 type Note = {
   id: string;
@@ -297,19 +298,29 @@ export function StickyNotes() {
     <section className="section-soft relative overflow-hidden px-4 py-24 sm:px-6 sm:py-32">
       <div className="pointer-events-none absolute inset-0 sticky-board" aria-hidden />
 
-      <div className="relative z-[3] mx-auto max-w-xl text-center">
-        <p className="text-xs uppercase tracking-[0.28em] text-[var(--muted)]">
+      <SectionReveal className="relative z-[3] mx-auto max-w-xl text-center">
+        <p
+          data-reveal
+          className="text-xs uppercase tracking-[0.28em] text-[var(--muted)]"
+        >
           Nuestros papelitos
         </p>
-        <h2 className="mt-3 font-display text-4xl text-[var(--ink)] sm:text-5xl">
+        <h2
+          data-reveal
+          className="mt-3 font-display text-4xl text-[var(--ink)] sm:text-5xl"
+        >
           Notitas
         </h2>
-        <p className="muted mx-auto mt-4 max-w-md text-sm leading-relaxed sm:text-base">
+        <p
+          data-reveal
+          className="muted mx-auto mt-4 max-w-md text-sm leading-relaxed sm:text-base"
+        >
           Pega una nota y ponla donde quieras en la pantalla. Se queda fija,
           aunque hagas scroll.
         </p>
 
         <form
+          data-reveal
           onSubmit={addNote}
           className="mx-auto mt-8 flex max-w-md flex-col gap-3 sm:flex-row sm:items-stretch"
         >
@@ -331,11 +342,11 @@ export function StickyNotes() {
           </button>
         </form>
 
-        <p className="muted mt-6 text-xs">
+        <p data-reveal className="muted mt-6 text-xs">
           {notes.length} notita{notes.length === 1 ? "" : "s"} · fijas en
           pantalla · doble click para editar
         </p>
-      </div>
+      </SectionReveal>
     </section>
   );
 }

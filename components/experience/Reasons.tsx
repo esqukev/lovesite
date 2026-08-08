@@ -3,11 +3,13 @@
 import { useRef, useState } from "react";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { REASONS } from "@/lib/data";
 import { useExperience } from "./ExperienceProvider";
 import { SectionPolaroid } from "./SectionPolaroid";
+import { SectionReveal } from "./SectionReveal";
 
-gsap.registerPlugin(useGSAP);
+gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 const HEART_COLORS = [
   { a: "#f0c4c7", b: "#e8b4b8", c: "#c98a92" },
@@ -34,12 +36,27 @@ export function Reasons() {
       const heart = heartRef.current;
       if (!heart) return;
 
-      gsap.to(heart, {
-        scale: 1.035,
-        duration: 1.4,
-        yoyo: true,
-        repeat: -1,
-        ease: "sine.inOut",
+      gsap.from(heart, {
+        scale: 0.55,
+        opacity: 0,
+        rotate: -12,
+        filter: "blur(10px)",
+        duration: 1.15,
+        ease: "back.out(1.6)",
+        scrollTrigger: {
+          trigger: rootRef.current,
+          start: "top 72%",
+          once: true,
+        },
+        onComplete: () => {
+          gsap.to(heart, {
+            scale: 1.035,
+            duration: 1.4,
+            yoyo: true,
+            repeat: -1,
+            ease: "sine.inOut",
+          });
+        },
       });
     },
     { scope: rootRef },
@@ -98,16 +115,19 @@ export function Reasons() {
         rotate="6deg"
       />
       <div className="relative z-10 mx-auto max-w-3xl text-center">
-        <h2
-          data-cinema="title"
-          className="font-display text-4xl text-[var(--ink)] sm:text-5xl"
-        >
-          Cosas que amo de ti
-        </h2>
-        <p className="muted mx-auto mt-4 max-w-md">
-          El corazón cambia cada vez que lo tocas. Hay una razón distinta cada
-          vez.
-        </p>
+        <SectionReveal>
+          <h2
+            data-reveal
+            data-cinema="title"
+            className="font-display text-4xl text-[var(--ink)] sm:text-5xl"
+          >
+            Cosas que amo de ti
+          </h2>
+          <p data-reveal className="muted mx-auto mt-4 max-w-md">
+            El corazón cambia cada vez que lo tocas. Hay una razón distinta cada
+            vez.
+          </p>
+        </SectionReveal>
 
         <div className="relative mx-auto mt-12 flex flex-col items-center">
           <button

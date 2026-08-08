@@ -130,7 +130,7 @@ export function Gate({
             </p>
             <form
               onSubmit={handleSubmit}
-              className="gate-form mt-12 flex flex-col items-center gap-4"
+              className="gate-form mt-12 flex w-full max-w-sm flex-col items-center gap-4"
             >
               <input
                 ref={inputRef}
@@ -142,8 +142,15 @@ export function Gate({
                   setError(false);
                 }}
                 placeholder="Ingresa tu identidad"
-                className="w-full max-w-sm rounded-2xl border border-[var(--ink)]/15 bg-white/60 px-5 py-4 text-center text-[var(--ink)] outline-none backdrop-blur-sm placeholder:text-[var(--ink)]/35 focus:border-[var(--accent)] focus:bg-white/80 transition-colors"
+                className="w-full rounded-2xl border border-[var(--ink)]/15 bg-white/60 px-5 py-4 text-center text-[var(--ink)] outline-none backdrop-blur-sm placeholder:text-[var(--ink)]/35 focus:border-[var(--accent)] focus:bg-white/80 transition-colors"
               />
+              <button
+                type="submit"
+                data-cursor="hover"
+                className="w-full rounded-2xl bg-[var(--ink)] px-5 py-4 text-sm tracking-wide text-[var(--cream)] transition hover:bg-[var(--accent)] active:scale-[0.99]"
+              >
+                Entrar
+              </button>
               {error && (
                 <p className="text-sm text-[var(--accent)]">
                   Creo que te equivocaste de universo ❤️
