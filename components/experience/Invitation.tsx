@@ -4,15 +4,17 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import confetti from "canvas-confetti";
 import { Button } from "@/components/ui/button";
+import { getDateCalendarUrl, getDateWhatsAppUrl } from "@/lib/data";
 import { useExperience } from "./ExperienceProvider";
 import { FrostHeart } from "./FrostHeart";
 
 export function Invitation({ active }: { active: boolean }) {
   const {
+    visitorRole,
     inviteOpen,
     setInviteOpen,
     inviteAccepted,
-    setInviteAccepted,
+    acceptInvite,
   } = useExperience();
   const [noAttempts, setNoAttempts] = useState(0);
   const [noPos, setNoPos] = useState({ x: 0, y: 0 });
@@ -20,8 +22,10 @@ export function Invitation({ active }: { active: boolean }) {
   const noRef = useRef<HTMLButtonElement>(null);
   const triggered = useRef(false);
 
+  const canInvite = visitorRole === "guest" && !inviteAccepted;
+
   useEffect(() => {
-    if (!active || inviteAccepted || triggered.current) return;
+    if (!active || !canInvite || triggered.current) return;
 
     const onScroll = () => {
       const max = document.documentElement.scrollHeight - window.innerHeight;
@@ -33,7 +37,7 @@ export function Invitation({ active }: { active: boolean }) {
     };
 
     const timer = window.setTimeout(() => {
-      if (!triggered.current && !inviteAccepted) {
+      if (!triggered.current && canInvite) {
         triggered.current = true;
         setInviteOpen(true);
       }
@@ -44,11 +48,10 @@ export function Invitation({ active }: { active: boolean }) {
       window.clearTimeout(timer);
       window.removeEventListener("scroll", onScroll);
     };
-  }, [active, inviteAccepted, setInviteOpen]);
+  }, [active, canInvite, setInviteOpen]);
 
   const accept = () => {
-    setInviteAccepted(true);
-    setInviteOpen(false);
+    acceptInvite();
     setShowFrost(true);
     confetti({
       particleCount: 90,
@@ -61,7 +64,12 @@ export function Invitation({ active }: { active: boolean }) {
 
   const afterFrost = () => {
     setShowFrost(false);
-    window.open("https://wa.link/o7fbh3", "_blank", "noopener,noreferrer");
+    // 1) Calendar so she can mark the day
+    window.open(getDateCalendarUrl(), "_blank", "noopener,noreferrer");
+    // 2) WhatsApp with the same calendar link (she can send it / keep it)
+    window.setTimeout(() => {
+      window.open(getDateWhatsAppUrl(), "_blank", "noopener,noreferrer");
+    }, 350);
   };
 
   const dodge = () => {
@@ -75,10 +83,12 @@ export function Invitation({ active }: { active: boolean }) {
     }
   };
 
+  if (!canInvite && !showFrost && !inviteOpen) return null;
+
   return (
     <>
       <AnimatePresence>
-        {inviteOpen && (
+        {inviteOpen && canInvite && (
           <motion.div
             className="fixed inset-0 z-[90] flex items-center justify-center bg-black/75 p-4 backdrop-blur-md"
             initial={{ opacity: 0 }}

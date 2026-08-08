@@ -29,7 +29,7 @@ import { SiteWarmth } from "./SiteWarmth";
 import { ScrollRevealBand } from "./ScrollRevealBand";
 
 function ExperienceInner() {
-  const { phase, setPhase } = useExperience();
+  const { phase, setPhase, setVisitorRole } = useExperience();
   const [booted, setBooted] = useState(false);
   const [unlocked, setUnlocked] = useState(false);
   const [started, setStarted] = useState(false);
@@ -50,7 +50,8 @@ function ExperienceInner() {
 
           {phase === "gate" && (
             <Gate
-              onUnlock={() => {
+              onUnlock={(role) => {
+                setVisitorRole(role);
                 setUnlocked(true);
                 setPhase("welcome");
               }}

@@ -4,13 +4,18 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useRef,
   useState,
   type ReactNode,
 } from "react";
-import type { EasterEggId } from "@/lib/data";
-import { EASTER_EGG_IDS } from "@/lib/data";
+import type { EasterEggId, VisitorRole } from "@/lib/data";
+import {
+  EASTER_EGG_IDS,
+  INVITE_ACCEPTED_KEY,
+  VISITOR_ROLE_KEY,
+} from "@/lib/data";
 
 type Phase = "gate" | "welcome" | "main";
 
@@ -23,6 +28,8 @@ export type Toast = {
 type ExperienceContextValue = {
   phase: Phase;
   setPhase: (phase: Phase) => void;
+  visitorRole: VisitorRole | null;
+  setVisitorRole: (role: VisitorRole) => void;
   eggsFound: Set<EasterEggId>;
   discoverEgg: (
     id: EasterEggId,
@@ -35,7 +42,7 @@ type ExperienceContextValue = {
   toasts: Toast[];
   pushToast: (title: string, detail?: string) => void;
   inviteAccepted: boolean;
-  setInviteAccepted: (v: boolean) => void;
+  acceptInvite: () => void;
   inviteOpen: boolean;
   setInviteOpen: (v: boolean) => void;
   lightboxOpen: boolean;
@@ -46,6 +53,7 @@ const ExperienceContext = createContext<ExperienceContextValue | null>(null);
 
 export function ExperienceProvider({ children }: { children: ReactNode }) {
   const [phase, setPhase] = useState<Phase>("gate");
+  const [visitorRole, setVisitorRoleState] = useState<VisitorRole | null>(null);
   const [eggsFound, setEggsFound] = useState<Set<EasterEggId>>(new Set());
   const [score, setScore] = useState(0);
   const [collectibles, setCollectibles] = useState(0);
@@ -54,6 +62,39 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
   const [inviteOpen, setInviteOpen] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const toastSeq = useRef(0);
+
+  useEffect(() => {
+    try {
+      if (localStorage.getItem(INVITE_ACCEPTED_KEY) === "1") {
+        setInviteAccepted(true);
+      }
+      const saved = sessionStorage.getItem(VISITOR_ROLE_KEY);
+      if (saved === "guest" || saved === "owner") {
+        setVisitorRoleState(saved);
+      }
+    } catch {
+      /* private mode */
+    }
+  }, []);
+
+  const setVisitorRole = useCallback((role: VisitorRole) => {
+    setVisitorRoleState(role);
+    try {
+      sessionStorage.setItem(VISITOR_ROLE_KEY, role);
+    } catch {
+      /* private mode */
+    }
+  }, []);
+
+  const acceptInvite = useCallback(() => {
+    setInviteAccepted(true);
+    setInviteOpen(false);
+    try {
+      localStorage.setItem(INVITE_ACCEPTED_KEY, "1");
+    } catch {
+      /* private mode */
+    }
+  }, [setInviteOpen]);
 
   const pushToast = useCallback((title: string, detail?: string) => {
     toastSeq.current += 1;
@@ -94,6 +135,8 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
     () => ({
       phase,
       setPhase,
+      visitorRole,
+      setVisitorRole,
       eggsFound,
       discoverEgg,
       allEggsFound: EASTER_EGG_IDS.every((id) => eggsFound.has(id)),
@@ -103,7 +146,7 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
       toasts,
       pushToast,
       inviteAccepted,
-      setInviteAccepted,
+      acceptInvite,
       inviteOpen,
       setInviteOpen,
       lightboxOpen,
@@ -111,6 +154,8 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
     }),
     [
       phase,
+      visitorRole,
+      setVisitorRole,
       eggsFound,
       discoverEgg,
       score,
@@ -119,6 +164,7 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
       toasts,
       pushToast,
       inviteAccepted,
+      acceptInvite,
       inviteOpen,
       lightboxOpen,
     ],

@@ -3,14 +3,20 @@
 import { FormEvent, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
-import { GATE_PASSWORD } from "@/lib/data";
+import { GATE_PASSWORDS, type VisitorRole } from "@/lib/data";
+
 gsap.registerPlugin(useGSAP);
 
-export function Gate({ onUnlock }: { onUnlock: () => void }) {
+export function Gate({
+  onUnlock,
+}: {
+  onUnlock: (role: VisitorRole) => void;
+}) {
   const rootRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [value, setValue] = useState("");
   const [error, setError] = useState(false);
+  const [role, setRole] = useState<VisitorRole | null>(null);
   const [status, setStatus] = useState<"idle" | "ok" | "welcome">("idle");
 
   useGSAP(
@@ -50,18 +56,21 @@ export function Gate({ onUnlock }: { onUnlock: () => void }) {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
 
-    if (value.trim().toLowerCase() !== GATE_PASSWORD) {
+    const key = value.trim().toLowerCase();
+    const nextRole = GATE_PASSWORDS[key];
+    if (!nextRole) {
       setError(true);
       shake();
       return;
     }
 
     setError(false);
+    setRole(nextRole);
     setStatus("ok");
 
     const tl = gsap.timeline({
       onComplete: () => {
-        onUnlock();
+        onUnlock(nextRole);
       },
     });
 
@@ -77,7 +86,13 @@ export function Gate({ onUnlock }: { onUnlock: () => void }) {
       .fromTo(
         ".gate-confirm",
         { opacity: 0, y: 16, filter: "blur(8px)" },
-        { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.9, ease: "power3.out" },
+        {
+          opacity: 1,
+          y: 0,
+          filter: "blur(0px)",
+          duration: 0.9,
+          ease: "power3.out",
+        },
       )
       .to({}, { duration: 1.1 })
       .to(rootRef.current, {
@@ -88,6 +103,11 @@ export function Gate({ onUnlock }: { onUnlock: () => void }) {
         ease: "power2.inOut",
       });
   };
+
+  const welcomeLine =
+    role === "owner"
+      ? "Bienvenido a nuestro pequeño universo."
+      : "Bienvenida a nuestro pequeño universo.";
 
   return (
     <div
@@ -132,9 +152,7 @@ export function Gate({ onUnlock }: { onUnlock: () => void }) {
             <p className="font-display text-2xl text-[var(--ink)] sm:text-3xl">
               Identidad confirmada...
             </p>
-            <p className="text-lg text-[var(--ink)]/65">
-              Bienvenida a nuestro pequeño universo.
-            </p>
+            <p className="text-lg text-[var(--ink)]/65">{welcomeLine}</p>
           </div>
         )}
       </div>

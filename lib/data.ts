@@ -1,4 +1,50 @@
-export const GATE_PASSWORD = "motzy";
+export type VisitorRole = "guest" | "owner";
+
+/** motzy = ella (ve la invitación). kevin = tú (sin invitación). */
+export const GATE_PASSWORDS: Record<string, VisitorRole> = {
+  motzy: "guest",
+  kevin: "owner",
+};
+
+export const INVITE_ACCEPTED_KEY = "motzy-date-invite-accepted";
+export const VISITOR_ROLE_KEY = "motzy-visitor-role";
+
+/** Domingo 16 de agosto 2026 — Costa Rica */
+export const DATE_INVITE = {
+  label: "Domingo 16",
+  title: "Nuestra cita ❤️",
+  startLocal: "20260816T190000",
+  endLocal: "20260816T220000",
+  timeZone: "America/Costa_Rica",
+  details:
+    "Cita oficial. Lugar por decidir. Dress code: Casual / Formal.",
+  location: "Por decidir",
+} as const;
+
+/** Google Calendar “add event” link — she can save the date in one tap */
+export function getDateCalendarUrl() {
+  const params = new URLSearchParams({
+    action: "TEMPLATE",
+    text: DATE_INVITE.title,
+    dates: `${DATE_INVITE.startLocal}/${DATE_INVITE.endLocal}`,
+    ctz: DATE_INVITE.timeZone,
+    details: DATE_INVITE.details,
+    location: DATE_INVITE.location,
+  });
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+}
+
+/** WhatsApp share with the calendar link inside the message */
+export function getDateWhatsAppUrl() {
+  const calendarUrl = getDateCalendarUrl();
+  const text = [
+    "Acepté nuestra cita del domingo 16 ❤️",
+    "",
+    "Toca este link para guardarla en el calendario:",
+    calendarUrl,
+  ].join("\n");
+  return `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+}
 
 export const WELCOME_LETTER = `Si estás viendo esto, es porque encontraste la llave de nuestro pequeño universo.
 
