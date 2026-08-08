@@ -80,9 +80,12 @@ export function SecretFrog({ active }: { active: boolean }) {
             transition={{
               opacity: { duration: 2.4, repeat: Infinity, ease: "easeInOut" },
             }}
-            className="mb-2 rounded-full bg-white/95 px-3 py-1.5 text-[11px] text-[var(--ink)] shadow-md ring-1 ring-black/5"
+            className="mb-2 max-w-[9.5rem] rounded-2xl bg-white/95 px-3 py-2 text-center text-[11px] leading-snug text-[var(--ink)] shadow-md ring-1 ring-black/5 sm:max-w-none sm:rounded-full sm:py-1.5 sm:text-left"
           >
-            Dame click para el sonido secreto
+            <span className="block sm:inline">Dame click para</span>
+            <span className="block sm:inline sm:before:content-['\00a0']">
+              el sonido secreto
+            </span>
           </motion.div>
         )}
       </AnimatePresence>
