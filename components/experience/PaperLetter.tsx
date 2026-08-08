@@ -135,7 +135,7 @@ export function PaperLetter({ onStart }: { onStart: () => void }) {
           )}
 
           {open && (
-            <div className="paper-sheet relative mx-auto w-full max-w-md pb-28">
+            <div className="paper-sheet relative mx-auto w-full max-w-md">
               <div className="paper-texture relative rounded-sm px-6 py-8 sm:px-10 sm:py-11">
                 <div className="pointer-events-none absolute left-0 top-0 h-full w-2 bg-gradient-to-r from-black/10 to-transparent" />
                 <p className="font-display text-[1.1rem] leading-[1.7] text-[#2c211c] whitespace-pre-wrap sm:text-[1.35rem] sm:leading-[1.75]">
@@ -144,39 +144,31 @@ export function PaperLetter({ onStart }: { onStart: () => void }) {
                     <span className="ml-0.5 inline-block h-4 w-[2px] animate-pulse bg-[#2c211c]/50" />
                   )}
                 </p>
+
+                {done && (
+                  <div className="mt-8 flex justify-center sm:mt-9">
+                    <button
+                      type="button"
+                      onPointerDown={(e) => {
+                        e.preventDefault();
+                        start();
+                      }}
+                      onClick={start}
+                      className="letter-seal-btn min-h-[52px] min-w-[11rem] touch-manipulation [-webkit-tap-highlight-color:transparent]"
+                      style={{ touchAction: "manipulation" }}
+                    >
+                      <span className="letter-seal-glow" aria-hidden />
+                      <span className="relative z-[1] px-10 py-3.5 font-display text-xl tracking-wide text-[#f7efe6]">
+                        Entrar
+                      </span>
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           )}
         </div>
       </div>
-
-      {/* Fixed CTA — outside scroll quirks, always on top */}
-      {done && (
-        <div className="pointer-events-none fixed inset-x-0 bottom-0 z-[220] flex justify-center px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4">
-          <button
-            type="button"
-            onPointerDown={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              start();
-            }}
-            onClick={(e) => {
-              e.preventDefault();
-              start();
-            }}
-            className="pointer-events-auto min-h-[56px] min-w-[12rem] rounded-full border border-[rgba(196,165,116,0.45)] px-10 py-3.5 font-display text-xl tracking-wide text-[#f7efe6] shadow-[0_14px_40px_rgba(168,90,100,0.45)]"
-            style={{
-              background:
-                "linear-gradient(145deg, #c98a92 0%, #a86570 45%, #8d4f5a 100%)",
-              touchAction: "manipulation",
-              WebkitTapHighlightColor: "transparent",
-              cursor: "pointer",
-            }}
-          >
-            Entrar
-          </button>
-        </div>
-      )}
     </div>
   );
 }
