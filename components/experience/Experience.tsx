@@ -14,7 +14,11 @@ import { PlacesMap } from "./PlacesMap";
 import { Reasons } from "./Reasons";
 import { Wishlist } from "./Wishlist";
 import { Countdown } from "./Countdown";
-import { StickyNotes } from "./StickyNotes";
+import {
+  StickyNotes,
+  StickyNotesLayer,
+  StickyNotesProvider,
+} from "./StickyNotes";
 import { Invitation } from "./Invitation";
 import { Footer } from "./Footer";
 import { AmbientEffects, HeartButton } from "./AmbientEffects";
@@ -64,31 +68,34 @@ function ExperienceInner() {
 
           {main && (
             <SmoothScroll enabled>
-              <div className="experience-root relative min-h-screen overflow-x-hidden">
-                <SiteWarmth />
+              <StickyNotesProvider>
+                <div className="experience-root relative min-h-screen overflow-x-hidden">
+                  <SiteWarmth />
 
-                <header className="fixed left-0 right-0 top-0 z-40 flex items-center justify-between px-5 py-5">
-                  <div className="font-display text-lg tracking-wide text-[var(--ink)]/80">
-                    Motzy{" "}
-                    <HeartButton className="ml-1 inline-block align-middle" />
-                  </div>
-                </header>
+                  <header className="fixed left-0 right-0 top-0 z-40 flex items-center justify-between px-5 py-5">
+                    <div className="font-display text-lg tracking-wide text-[var(--ink)]/80">
+                      Motzy{" "}
+                      <HeartButton className="ml-1 inline-block align-middle" />
+                    </div>
+                  </header>
 
-                <main className="relative z-[3]">
-                  <Hero />
-                  <StackedMemories />
-                  <Gallery />
-                  <ScrollRevealBand />
-                  <PlacesMap />
-                  <Reasons />
-                  <Wishlist />
-                  <StickyNotes />
-                  <Countdown />
-                  <Footer />
-                </main>
+                  <main className="relative z-[3]">
+                    <Hero />
+                    <StackedMemories />
+                    <Gallery />
+                    <ScrollRevealBand />
+                    <PlacesMap />
+                    <Reasons />
+                    <Wishlist />
+                    <StickyNotes />
+                    <Countdown />
+                    <Footer />
+                  </main>
 
-                <Invitation active />
-              </div>
+                  <StickyNotesLayer />
+                  <Invitation active />
+                </div>
+              </StickyNotesProvider>
             </SmoothScroll>
           )}
         </>
