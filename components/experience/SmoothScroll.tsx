@@ -18,10 +18,26 @@ export function SmoothScroll({
   useEffect(() => {
     if (!enabled) return;
 
+    // Native scroll on touch so iOS can collapse the URL / Dynamic Island chrome.
+    const coarse =
+      typeof window !== "undefined" &&
+      window.matchMedia("(pointer: coarse)").matches;
+
+    if (coarse) {
+      const onScroll = () => ScrollTrigger.update();
+      window.addEventListener("scroll", onScroll, { passive: true });
+      const refreshTimer = window.setTimeout(() => ScrollTrigger.refresh(), 600);
+      return () => {
+        window.clearTimeout(refreshTimer);
+        window.removeEventListener("scroll", onScroll);
+      };
+    }
+
     const lenis = new Lenis({
       duration: 1.45,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
+      syncTouch: false,
       touchMultiplier: 1.15,
       wheelMultiplier: 0.95,
     });
@@ -37,7 +53,6 @@ export function SmoothScroll({
     const onResize = () => ScrollTrigger.refresh();
     window.addEventListener("resize", onResize);
 
-    // Refresh after images/layout settle
     const refreshTimer = window.setTimeout(() => ScrollTrigger.refresh(), 600);
 
     return () => {

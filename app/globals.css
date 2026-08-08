@@ -20,11 +20,20 @@
   --font-display: var(--font-display);
 }
 
-html,
+html {
+  background: var(--void);
+  color: var(--ink);
+  /* Let iOS Safari collapse the URL / Dynamic Island chrome on scroll */
+  height: auto;
+  min-height: 100%;
+  overflow-x: clip;
+}
+
 body {
   background: var(--void);
   color: var(--ink);
   min-height: 100%;
+  overflow-x: clip;
 }
 
 .experience-root {
@@ -66,7 +75,6 @@ body {
 
 body {
   font-family: var(--font-body), system-ui, sans-serif;
-  overflow-x: hidden;
 }
 
 .font-display {
@@ -121,6 +129,7 @@ body {
 .letter-seal-glow {
   position: absolute;
   inset: -40%;
+  pointer-events: none;
   background: linear-gradient(
     120deg,
     transparent 30%,
@@ -358,6 +367,7 @@ body {
   color: rgba(232, 180, 184, 0.55);
   filter: drop-shadow(0 0 10px rgba(232, 180, 184, 0.35));
   will-change: transform, opacity;
+  pointer-events: none !important;
 }
 
 .game-world {

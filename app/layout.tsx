@@ -1,6 +1,12 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Caveat, Figtree, Instrument_Serif } from "next/font/google";
 import "./globals.css";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
 
 const display = Instrument_Serif({
   variable: "--font-display",
@@ -57,9 +63,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="es"
-      className={`${display.variable} ${body.variable} ${letter.variable} h-full antialiased`}
+      className={`${display.variable} ${body.variable} ${letter.variable} antialiased`}
     >
-      <body className="min-h-full bg-[var(--void)] text-[var(--ink)]">
+      <body className="min-h-dvh bg-[var(--void)] text-[var(--ink)]">
         {children}
       </body>
     </html>
