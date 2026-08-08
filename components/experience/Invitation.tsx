@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import confetti from "canvas-confetti";
 import { Button } from "@/components/ui/button";
-import { getDateCalendarUrl, getDateWhatsAppUrl } from "@/lib/data";
+import { getDateWhatsAppUrl, MOTZY_WHATSAPP_NUMBER } from "@/lib/data";
 import { useExperience } from "./ExperienceProvider";
 import { FrostHeart } from "./FrostHeart";
 
@@ -19,6 +19,7 @@ export function Invitation({ active }: { active: boolean }) {
   const [noAttempts, setNoAttempts] = useState(0);
   const [noPos, setNoPos] = useState({ x: 0, y: 0 });
   const [showFrost, setShowFrost] = useState(false);
+  const [showSend, setShowSend] = useState(false);
   const noRef = useRef<HTMLButtonElement>(null);
   const triggered = useRef(false);
 
@@ -64,12 +65,12 @@ export function Invitation({ active }: { active: boolean }) {
 
   const afterFrost = () => {
     setShowFrost(false);
-    // Apple Calendar (.ics) — on iPhone asks to add the event
-    window.open(getDateCalendarUrl(), "_blank", "noopener,noreferrer");
-    // WhatsApp chat (MOTZY_WHATSAPP_NUMBER) with the calendar link in the text
-    window.setTimeout(() => {
-      window.open(getDateWhatsAppUrl(), "_blank", "noopener,noreferrer");
-    }, 500);
+    setShowSend(true);
+  };
+
+  /** Opens WhatsApp Desktop/Web → her chat, message ready to send to her phone */
+  const sendToPhone = () => {
+    window.open(getDateWhatsAppUrl(), "_blank", "noopener,noreferrer");
   };
 
   const dodge = () => {
@@ -83,7 +84,9 @@ export function Invitation({ active }: { active: boolean }) {
     }
   };
 
-  if (!canInvite && !showFrost && !inviteOpen) return null;
+  if (!canInvite && !showFrost && !inviteOpen && !showSend) return null;
+
+  const hasPhone = Boolean(MOTZY_WHATSAPP_NUMBER.replace(/\D/g, ""));
 
   return (
     <>
@@ -156,6 +159,53 @@ export function Invitation({ active }: { active: boolean }) {
           onDone={afterFrost}
         />
       )}
+
+      <AnimatePresence>
+        {showSend && (
+          <motion.div
+            className="fixed inset-0 z-[96] flex items-center justify-center bg-black/75 p-4 backdrop-blur-md"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              initial={{ scale: 0.92, opacity: 0, y: 16 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              className="w-full max-w-md rounded-[2rem] border border-white/15 bg-[#141110]/95 p-8 text-center shadow-2xl"
+            >
+              <p className="text-xs uppercase tracking-[0.28em] text-white/40">
+                Un paso más
+              </p>
+              <h3 className="mt-3 font-display text-3xl text-[var(--cream)] sm:text-4xl">
+                Envíatela al celular
+              </h3>
+              <p className="mt-4 text-sm leading-relaxed text-white/65">
+                Se abrirá WhatsApp con un mensaje listo para ti. Solo pulsa{" "}
+                <span className="text-white/90">Enviar</span>. En tu iPhone
+                toca el link y la cita queda en tu Calendario.
+              </p>
+
+              <Button size="lg" className="mt-8 w-full sm:w-auto" onClick={sendToPhone}>
+                Abrir WhatsApp
+              </Button>
+
+              {!hasPhone && (
+                <p className="mt-4 text-xs text-amber-200/80">
+                  Tip: elige el chat de Motzy al abrir WhatsApp.
+                </p>
+              )}
+
+              <button
+                type="button"
+                onClick={() => setShowSend(false)}
+                className="mt-5 text-sm text-white/40 transition hover:text-white/70"
+              >
+                Cerrar
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }

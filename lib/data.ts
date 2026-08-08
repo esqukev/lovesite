@@ -20,37 +20,48 @@ export const DATE_INVITE = {
 /**
  * Número de Motzy en WhatsApp (código país + número, sin + ni espacios).
  * Ejemplo Costa Rica: 50688887777
- * Déjalo vacío hasta que lo pongas; si está vacío, WhatsApp abre sin chat fijo.
+ *
+ * Al aceptar la cita en la PC, se abre WhatsApp Desktop/Web hacia ESTE número
+ * con el link del calendario listo para enviar → le llega al iPhone.
  */
 export const MOTZY_WHATSAPP_NUMBER = "";
+
+/**
+ * URL pública del sitio (para que el link del .ics funcione en su celular).
+ * Si está vacío, usa el dominio actual (debe probarse en el deploy, no en localhost).
+ */
+export const PUBLIC_SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "";
 
 /** Full https URL to the .ics (Apple Calendar opens this on iPhone) */
 export function getDateCalendarUrl(origin?: string) {
   const base =
-    origin ??
+    origin ||
+    PUBLIC_SITE_URL ||
     (typeof window !== "undefined" ? window.location.origin : "");
   return `${base}${DATE_INVITE.icsPath}`;
 }
 
 /**
- * WhatsApp deep link to her number, with the Apple Calendar link in the text.
- * Format: https://wa.me/506XXXXXXXX?text=...
+ * WhatsApp → chat con ella, mensaje listo con el link de Apple Calendar.
+ * En la PC solo hay que pulsar Enviar; a ella le llega al teléfono.
  */
 export function getDateWhatsAppUrl(origin?: string) {
   const calendarUrl = getDateCalendarUrl(origin);
   const text = [
-    "Acepté nuestra cita del domingo 16 ❤️",
+    "Confirmé nuestra cita del domingo 16 ❤️",
     "",
-    "Toca este link para guardarla en tu calendario de Apple:",
+    "Toca este link en el iPhone para guardarla en tu Calendario:",
     calendarUrl,
   ].join("\n");
 
   const encoded = encodeURIComponent(text);
   const phone = MOTZY_WHATSAPP_NUMBER.replace(/\D/g, "");
-  if (phone) {
-    return `https://wa.me/${phone}?text=${encoded}`;
+  if (!phone) {
+    // Sin número aún: abre WhatsApp para elegir el chat a mano
+    return `https://api.whatsapp.com/send?text=${encoded}`;
   }
-  return `https://api.whatsapp.com/send?text=${encoded}`;
+  return `https://wa.me/${phone}?text=${encoded}`;
 }
 
 export const WELCOME_LETTER = `Si estás viendo esto, es porque encontraste la llave de nuestro pequeño universo.
