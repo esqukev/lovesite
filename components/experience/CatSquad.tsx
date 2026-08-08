@@ -78,7 +78,7 @@ type CatInstance = {
 };
 
 export function CatSquad({ active }: { active: boolean }) {
-  const { discoverEgg, lightboxOpen, inviteOpen } = useExperience();
+  const { discoverEgg, lightboxOpen } = useExperience();
   const catRef = useRef<HTMLButtonElement>(null);
   const bubbleRef = useRef<HTMLDivElement>(null);
   const [cat, setCat] = useState<CatInstance | null>(null);
@@ -120,7 +120,8 @@ export function CatSquad({ active }: { active: boolean }) {
   }, []);
 
   useEffect(() => {
-    if (!active || lightboxOpen || inviteOpen) {
+    // Solo se pausan con el lightbox de fotos — la invitación ya no los apaga
+    if (!active || lightboxOpen) {
       closePopupAndCat();
       if (cycleTimer.current) window.clearTimeout(cycleTimer.current);
       return;
@@ -148,7 +149,7 @@ export function CatSquad({ active }: { active: boolean }) {
     const first = window.setTimeout(() => {
       spawn();
       scheduleNext(8000 + Math.random() * 4000);
-    }, 1200);
+    }, 900);
 
     return () => {
       cancelled = true;
@@ -156,7 +157,7 @@ export function CatSquad({ active }: { active: boolean }) {
       if (cycleTimer.current) window.clearTimeout(cycleTimer.current);
       if (hideTimer.current) window.clearTimeout(hideTimer.current);
     };
-  }, [active, lightboxOpen, inviteOpen, spawn, closePopupAndCat]);
+  }, [active, lightboxOpen, spawn, closePopupAndCat]);
 
   useEffect(() => {
     const el = catRef.current;
@@ -233,7 +234,7 @@ export function CatSquad({ active }: { active: boolean }) {
     }, 3000);
   };
 
-  if (!active || lightboxOpen || inviteOpen) return null;
+  if (!active || lightboxOpen) return null;
   const spot = cat ? SPOTS[cat.spotIndex] : null;
 
   return (
@@ -245,7 +246,7 @@ export function CatSquad({ active }: { active: boolean }) {
             initial={{ opacity: 0 }}
             exit={{ opacity: 0, scale: 0.7, y: 10 }}
             transition={{ duration: 0.3 }}
-            className="fixed z-[58]"
+            className="fixed z-[72]"
             style={{
               top: spot.top,
               left: spot.left,
