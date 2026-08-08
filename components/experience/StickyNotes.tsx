@@ -433,11 +433,11 @@ export function StickyNotesLayer() {
                   }
                 }}
                 onPointerDown={(e) => e.stopPropagation()}
-                className="mt-1 w-full resize-none bg-transparent font-letter text-[15px] leading-snug text-[#3a2a30] outline-none"
+                className="mt-1 w-full resize-none bg-transparent font-letter text-[17px] leading-snug text-[#3a2a30] outline-none sm:text-[18px]"
                 rows={4}
               />
             ) : (
-              <p className="pr-1 pt-1 font-letter text-[15px] leading-snug text-[#3a2a30]">
+              <p className="pr-1 pt-1 font-letter text-[17px] leading-snug text-[#3a2a30] sm:text-[18px]">
                 {note.text}
               </p>
             )}
