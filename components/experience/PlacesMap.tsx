@@ -11,7 +11,7 @@ import { SectionReveal } from "./SectionReveal";
 const MapInner = dynamic(() => import("./PlacesMapInner"), {
   ssr: false,
   loading: () => (
-    <div className="flex h-[560px] items-center justify-center rounded-[1.5rem] bg-white/50 text-[var(--ink)]/40">
+    <div className="flex h-[300px] items-center justify-center rounded-[1.5rem] bg-white/50 text-[var(--ink)]/40 sm:h-[420px] md:h-[560px]">
       Cargando nuestro mapa...
     </div>
   ),

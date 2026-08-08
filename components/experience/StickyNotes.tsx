@@ -15,25 +15,15 @@ import {
 import { createPortal } from "react-dom";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  SEED_NOTES,
+  getStoredGateKey,
+  type SyncNote,
+} from "@/lib/sync";
 import { useExperience } from "./ExperienceProvider";
 import { SectionReveal } from "./SectionReveal";
 
-type Note = {
-  id: string;
-  text: string;
-  color: string;
-  rotate: number;
-  /** % of viewport width */
-  x: number;
-  /** % of viewport height */
-  y: number;
-  z: number;
-};
-
-type Store = {
-  version: 4;
-  notes: Note[];
-};
+type Note = SyncNote;
 
 type NotesContextValue = {
   notes: Note[];
@@ -61,49 +51,19 @@ const NOTE_COLORS = [
   "#f5e6ee",
 ];
 
-const SEED_NOTES: Note[] = [
-  {
-    id: "seed-1",
-    text: "Te pienso más de lo que admito.",
-    color: "#ffd9e2",
-    rotate: -4,
-    x: 4,
-    y: 22,
-    z: 1,
-  },
-  {
-    id: "seed-2",
-    text: "Gracias por ser mi lugar seguro.",
-    color: "#fff4c8",
-    rotate: 3,
-    x: 78,
-    y: 30,
-    z: 2,
-  },
-  {
-    id: "seed-3",
-    text: "Hoy también te elijo.",
-    color: "#d9f0e4",
-    rotate: -2,
-    x: 8,
-    y: 68,
-    z: 3,
-  },
-];
-
 const NotesContext = createContext<NotesContextValue | null>(null);
 
-function readStore(): Store {
+function readLocalNotes(): Note[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return { version: 4, notes: SEED_NOTES };
-    const parsed = JSON.parse(raw) as Store;
+    if (!raw) return SEED_NOTES;
+    const parsed = JSON.parse(raw) as { version?: number; notes?: Note[] };
     if (parsed?.version === 4 && Array.isArray(parsed.notes)) {
-      return parsed;
+      return parsed.notes;
     }
-    return { version: 4, notes: SEED_NOTES };
+    return SEED_NOTES;
   } catch {
-    return { version: 4, notes: SEED_NOTES };
+    return SEED_NOTES;
   }
 }
 
@@ -129,21 +89,130 @@ export function StickyNotesProvider({ children }: { children: ReactNode }) {
     offsetX: number;
     offsetY: number;
   } | null>(null);
+  const skipNextSave = useRef(true);
+  const syncedAt = useRef("");
+  const dirty = useRef(false);
+  const saveTimer = useRef<number | null>(null);
+
+  const persistCloud = useCallback(async (nextNotes: Note[]) => {
+    const password = getStoredGateKey();
+    if (!password) return;
+    try {
+      const res = await fetch("/api/sync/notes", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password, notes: nextNotes }),
+      });
+      if (!res.ok) return;
+      const data = (await res.json()) as { updatedAt?: string };
+      if (data.updatedAt) syncedAt.current = data.updatedAt;
+      dirty.current = false;
+    } catch {
+      /* offline / blob missing — local still works */
+    }
+  }, []);
 
   useEffect(() => {
-    const store = readStore();
-    setNotes(store.notes);
-    setTopZ(Math.max(10, ...store.notes.map((n) => n.z), 0) + 1);
-    setReady(true);
-  }, []);
+    let cancelled = false;
+
+    const load = async () => {
+      const local = readLocalNotes();
+      try {
+        const res = await fetch("/api/sync/notes", { cache: "no-store" });
+        const data = (await res.json()) as {
+          configured?: boolean;
+          notes?: Note[];
+          updatedAt?: string;
+        };
+
+        if (cancelled) return;
+
+        const remote = Array.isArray(data.notes) ? data.notes : null;
+        const remoteFresh =
+          Boolean(data.updatedAt) &&
+          data.updatedAt !== new Date(0).toISOString() &&
+          remote !== null;
+
+        if (remoteFresh && remote) {
+          setNotes(remote);
+          setTopZ(Math.max(10, ...remote.map((n) => n.z), 0) + 1);
+          syncedAt.current = data.updatedAt ?? "";
+        } else {
+          setNotes(local);
+          setTopZ(Math.max(10, ...local.map((n) => n.z), 0) + 1);
+          if (data.configured && getStoredGateKey()) {
+            void persistCloud(local);
+          }
+        }
+      } catch {
+        if (cancelled) return;
+        setNotes(local);
+        setTopZ(Math.max(10, ...local.map((n) => n.z), 0) + 1);
+      } finally {
+        if (!cancelled) {
+          skipNextSave.current = true;
+          setReady(true);
+        }
+      }
+    };
+
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, [persistCloud]);
 
   useEffect(() => {
     if (!ready) return;
     localStorage.setItem(
       STORAGE_KEY,
-      JSON.stringify({ version: 4, notes } satisfies Store),
+      JSON.stringify({ version: 4, notes }),
     );
-  }, [notes, ready]);
+
+    if (skipNextSave.current) {
+      skipNextSave.current = false;
+      return;
+    }
+
+    dirty.current = true;
+    if (saveTimer.current) window.clearTimeout(saveTimer.current);
+    saveTimer.current = window.setTimeout(() => {
+      void persistCloud(notes);
+    }, 600);
+
+    return () => {
+      if (saveTimer.current) window.clearTimeout(saveTimer.current);
+    };
+  }, [notes, ready, persistCloud]);
+
+  useEffect(() => {
+    if (!ready) return;
+
+    const poll = window.setInterval(async () => {
+      if (dirty.current || dragRef.current || document.hidden) return;
+      try {
+        const res = await fetch("/api/sync/notes", { cache: "no-store" });
+        const data = (await res.json()) as {
+          notes?: Note[];
+          updatedAt?: string;
+        };
+        if (
+          data.updatedAt &&
+          data.updatedAt !== syncedAt.current &&
+          Array.isArray(data.notes)
+        ) {
+          skipNextSave.current = true;
+          syncedAt.current = data.updatedAt;
+          setNotes(data.notes);
+          setTopZ(Math.max(10, ...data.notes.map((n) => n.z), 0) + 1);
+        }
+      } catch {
+        /* ignore poll errors */
+      }
+    }, 12_000);
+
+    return () => window.clearInterval(poll);
+  }, [ready]);
 
   const bringFront = useCallback((id: string) => {
     setTopZ((z) => {
@@ -315,8 +384,8 @@ export function StickyNotes() {
           data-reveal
           className="muted mx-auto mt-4 max-w-md text-sm leading-relaxed sm:text-base"
         >
-          Pega una nota y ponla donde quieras en la pantalla. Se queda fija,
-          aunque hagas scroll.
+          Pega una nota y ponla donde quieras en la pantalla. Se sincroniza
+          entre el celular y la compu.
         </p>
 
         <form

@@ -1,6 +1,13 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import {
+  FormEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import confetti from "canvas-confetti";
 import { Check, Plus, Trash2 } from "lucide-react";
 import { gsap } from "gsap";
@@ -8,6 +15,7 @@ import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { WISHLIST } from "@/lib/data";
 import { cn } from "@/lib/utils";
+import { getStoredGateKey } from "@/lib/sync";
 import { useExperience } from "./ExperienceProvider";
 import { SectionPolaroid } from "./SectionPolaroid";
 import { SectionReveal } from "./SectionReveal";
@@ -29,6 +37,23 @@ function readStorage<T>(key: string, fallback: T): T {
   }
 }
 
+function readLocalWishlist() {
+  const loadedChecked = readStorage<Record<string, boolean>>(CHECKED_KEY, {});
+  const loadedCustom = readStorage<Item[]>(CUSTOM_KEY, []);
+  if (!localStorage.getItem(CHECKED_KEY)) {
+    Object.assign(
+      loadedChecked,
+      readStorage<Record<string, boolean>>("motzy-wishlist-checked", {}),
+    );
+  }
+  if (!localStorage.getItem(CUSTOM_KEY)) {
+    loadedCustom.push(
+      ...readStorage<Item[]>("motzy-wishlist-custom", []),
+    );
+  }
+  return { checked: loadedChecked, custom: loadedCustom };
+}
+
 export function Wishlist() {
   const rootRef = useRef<HTMLElement>(null);
   const { pushToast } = useExperience();
@@ -37,33 +62,137 @@ export function Wishlist() {
   const [draft, setDraft] = useState("");
   const [celebrated, setCelebrated] = useState(false);
   const [ready, setReady] = useState(false);
+  const skipNextSave = useRef(true);
+  const syncedAt = useRef("");
+  const dirty = useRef(false);
+  const saveTimer = useRef<number | null>(null);
+
+  const persistCloud = useCallback(
+    async (
+      nextChecked: Record<string, boolean>,
+      nextCustom: Item[],
+    ) => {
+      const password = getStoredGateKey();
+      if (!password) return;
+      try {
+        const res = await fetch("/api/sync/wishlist", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            password,
+            checked: nextChecked,
+            custom: nextCustom,
+          }),
+        });
+        if (!res.ok) return;
+        const data = (await res.json()) as { updatedAt?: string };
+        if (data.updatedAt) syncedAt.current = data.updatedAt;
+        dirty.current = false;
+      } catch {
+        /* keep local */
+      }
+    },
+    [],
+  );
 
   useEffect(() => {
-    const loadedChecked = readStorage<Record<string, boolean>>(CHECKED_KEY, {});
-    const loadedCustom = readStorage<Item[]>(CUSTOM_KEY, []);
-    // migrate from old keys if present
-    if (!localStorage.getItem(CHECKED_KEY)) {
-      const old = readStorage<Record<string, boolean>>("motzy-wishlist-checked", {});
-      Object.assign(loadedChecked, old);
-    }
-    if (!localStorage.getItem(CUSTOM_KEY)) {
-      const old = readStorage<Item[]>("motzy-wishlist-custom", []);
-      loadedCustom.push(...old);
-    }
-    setChecked(loadedChecked);
-    setCustom(loadedCustom);
-    setReady(true);
-  }, []);
+    let cancelled = false;
+
+    const load = async () => {
+      const local = readLocalWishlist();
+      try {
+        const res = await fetch("/api/sync/wishlist", { cache: "no-store" });
+        const data = (await res.json()) as {
+          configured?: boolean;
+          checked?: Record<string, boolean>;
+          custom?: Item[];
+          updatedAt?: string;
+        };
+
+        if (cancelled) return;
+
+        const remoteFresh =
+          Boolean(data.updatedAt) &&
+          data.updatedAt !== new Date(0).toISOString() &&
+          data.checked;
+
+        if (remoteFresh && data.checked) {
+          setChecked(data.checked);
+          setCustom(Array.isArray(data.custom) ? data.custom : []);
+          syncedAt.current = data.updatedAt ?? "";
+        } else {
+          setChecked(local.checked);
+          setCustom(local.custom);
+          if (data.configured && getStoredGateKey()) {
+            void persistCloud(local.checked, local.custom);
+          }
+        }
+      } catch {
+        if (cancelled) return;
+        setChecked(local.checked);
+        setCustom(local.custom);
+      } finally {
+        if (!cancelled) {
+          skipNextSave.current = true;
+          setReady(true);
+        }
+      }
+    };
+
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, [persistCloud]);
 
   useEffect(() => {
     if (!ready) return;
     localStorage.setItem(CHECKED_KEY, JSON.stringify(checked));
-  }, [checked, ready]);
+    localStorage.setItem(CUSTOM_KEY, JSON.stringify(custom));
+
+    if (skipNextSave.current) {
+      skipNextSave.current = false;
+      return;
+    }
+
+    dirty.current = true;
+    if (saveTimer.current) window.clearTimeout(saveTimer.current);
+    saveTimer.current = window.setTimeout(() => {
+      void persistCloud(checked, custom);
+    }, 500);
+
+    return () => {
+      if (saveTimer.current) window.clearTimeout(saveTimer.current);
+    };
+  }, [checked, custom, ready, persistCloud]);
 
   useEffect(() => {
     if (!ready) return;
-    localStorage.setItem(CUSTOM_KEY, JSON.stringify(custom));
-  }, [custom, ready]);
+    const poll = window.setInterval(async () => {
+      if (dirty.current || document.hidden) return;
+      try {
+        const res = await fetch("/api/sync/wishlist", { cache: "no-store" });
+        const data = (await res.json()) as {
+          checked?: Record<string, boolean>;
+          custom?: Item[];
+          updatedAt?: string;
+        };
+        if (
+          data.updatedAt &&
+          data.updatedAt !== syncedAt.current &&
+          data.checked
+        ) {
+          skipNextSave.current = true;
+          syncedAt.current = data.updatedAt;
+          setChecked(data.checked);
+          setCustom(Array.isArray(data.custom) ? data.custom : []);
+        }
+      } catch {
+        /* ignore */
+      }
+    }, 12_000);
+    return () => window.clearInterval(poll);
+  }, [ready]);
 
   const items = useMemo(
     () => [...WISHLIST.map((i) => ({ ...i, custom: false })), ...custom],
@@ -107,7 +236,7 @@ export function Wishlist() {
   const toggle = (id: string) => {
     setChecked((prev) => {
       const next = { ...prev, [id]: !prev[id] };
-      if (!prev[id]) pushToast("Hecho", "Guardado aquí");
+      if (!prev[id]) pushToast("Hecho", "Guardado para los dos");
       return next;
     });
   };
@@ -166,8 +295,8 @@ export function Wishlist() {
             Lo que todavía nos falta
           </h2>
           <p data-reveal className="muted mx-auto mt-4 max-w-md">
-            Márcalo cuando lo vivamos. Lo que añadas o marques se guarda en este
-            dispositivo y sigue ahí la próxima vez.
+            Márcalo cuando lo vivamos. Lo que añadas o marques se guarda en la
+            nube para los dos, en el celular y en la compu.
           </p>
           <p
             data-reveal

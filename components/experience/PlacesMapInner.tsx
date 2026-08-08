@@ -124,7 +124,7 @@ export default function PlacesMapInner({
       center={[10.0, -84.5]}
       zoom={7}
       scrollWheelZoom={false}
-      className="h-[560px] w-full bg-[#0b0a09] [&_.leaflet-control-attribution]:hidden"
+      className="h-[300px] w-full bg-[#0b0a09] sm:h-[420px] md:h-[560px] [&_.leaflet-control-attribution]:hidden"
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
