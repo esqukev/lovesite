@@ -121,16 +121,16 @@ export function Gate({
       className="fixed inset-0 z-50 flex items-center justify-center bg-[#f3e8ea] px-6"
     >
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(232,170,176,0.4),transparent_55%),radial-gradient(ellipse_at_bottom,rgba(255,214,188,0.35),transparent_50%)]" />
-      <div className="relative mx-auto max-w-xl text-center">
+      <div className="relative flex w-full max-w-xl flex-col items-center text-center">
         {status === "idle" || status === "ok" ? (
           <>
-            <p className="gate-line font-display text-2xl leading-relaxed text-[var(--ink)] sm:text-3xl md:text-4xl">
+            <p className="gate-line w-full font-display text-2xl leading-relaxed text-[var(--ink)] sm:text-3xl md:text-4xl">
               Existe un pequeño lugar al que solamente dos personas tienen
               acceso.
             </p>
             <form
               onSubmit={handleSubmit}
-              className="gate-form mt-12 flex w-full max-w-sm flex-col items-center gap-4"
+              className="gate-form mx-auto mt-12 flex w-full max-w-sm flex-col items-stretch gap-4"
             >
               <input
                 ref={inputRef}
@@ -147,12 +147,12 @@ export function Gate({
               <button
                 type="submit"
                 data-cursor="hover"
-                className="w-full rounded-2xl bg-[var(--ink)] px-5 py-4 text-sm tracking-wide text-[var(--cream)] transition hover:bg-[var(--accent)] active:scale-[0.99]"
+                className="flex w-full items-center justify-center rounded-2xl bg-[var(--ink)] px-5 py-4 text-sm leading-none tracking-wide text-[var(--cream)] transition hover:bg-[var(--accent)] active:scale-[0.99]"
               >
                 Entrar
               </button>
               {error && (
-                <p className="text-sm text-[var(--accent)]">
+                <p className="text-center text-sm text-[var(--accent)]">
                   Creo que te equivocaste de universo ❤️
                 </p>
               )}
@@ -161,7 +161,7 @@ export function Gate({
         ) : null}
 
         {status !== "idle" && (
-          <div className="gate-confirm space-y-4 opacity-0">
+          <div className="gate-confirm w-full space-y-4 opacity-0">
             <p className="font-display text-2xl text-[var(--ink)] sm:text-3xl">
               Identidad confirmada...
             </p>

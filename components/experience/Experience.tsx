@@ -75,9 +75,9 @@ function ExperienceInner() {
 
                   <header className="fixed left-0 right-0 top-0 z-40 flex items-center justify-between px-5 py-5">
                     <div className="font-display text-lg tracking-wide text-[var(--ink)]/80">
-                      Motzy{" "}
-                      <HeartButton className="ml-1 inline-block align-middle" />
+                      Motzy
                     </div>
+                    <HeartButton className="text-base" />
                   </header>
 
                   <main className="relative z-[3]">

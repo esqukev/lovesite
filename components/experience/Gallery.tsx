@@ -283,6 +283,39 @@ export function Gallery() {
         <p className="muted mt-3">
           Pasa el mouse para agrandarlas. Muévelas. Ábrelas.
         </p>
+
+        <div className="mt-6 flex flex-col items-center gap-2">
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => void onPickFile(e.target.files)}
+          />
+          <button
+            type="button"
+            data-cursor="hover"
+            disabled={uploading}
+            onClick={() => fileRef.current?.click()}
+            className="inline-flex items-center gap-2 rounded-full bg-[var(--ink)] px-5 py-3 text-sm text-[var(--cream)] transition hover:bg-[var(--accent)] disabled:opacity-50"
+          >
+            {uploading ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              <ImagePlus size={16} />
+            )}
+            {uploading ? "Subiendo…" : "Subir foto"}
+          </button>
+          {configured === false && (
+            <p className="max-w-sm text-xs text-[var(--accent)]">
+              Falta activar Vercel Blob en el proyecto para guardar fotos en la
+              nube.
+            </p>
+          )}
+          {uploadError && (
+            <p className="max-w-sm text-xs text-[var(--accent)]">{uploadError}</p>
+          )}
+        </div>
       </div>
 
       <div
@@ -321,45 +354,6 @@ export function Gallery() {
             </button>
           );
         })}
-      </div>
-
-      <div className="relative z-30 mx-auto mt-16 flex max-w-md flex-col items-center gap-3 border-t border-[var(--line)]/70 pt-12 text-center sm:mt-20">
-        <input
-          ref={fileRef}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={(e) => void onPickFile(e.target.files)}
-        />
-        <p className="text-xs uppercase tracking-[0.28em] text-[var(--gold)]">
-          Añadir recuerdo
-        </p>
-        <button
-          type="button"
-          data-cursor="hover"
-          disabled={uploading}
-          onClick={() => fileRef.current?.click()}
-          className="inline-flex items-center gap-2 rounded-full bg-[var(--ink)] px-7 py-3.5 text-sm text-[var(--cream)] shadow-[0_12px_28px_rgba(42,28,34,0.18)] transition hover:bg-[var(--accent)] disabled:opacity-50"
-        >
-          {uploading ? (
-            <Loader2 size={16} className="animate-spin" />
-          ) : (
-            <ImagePlus size={16} />
-          )}
-          {uploading ? "Subiendo…" : "Subir foto"}
-        </button>
-        <p className="muted text-xs">
-          Desde el celular o la compu. Queda en la nube para los dos.
-        </p>
-        {configured === false && (
-          <p className="max-w-sm text-xs text-[var(--accent)]">
-            Falta activar Vercel Blob en el proyecto para guardar fotos en la
-            nube.
-          </p>
-        )}
-        {uploadError && (
-          <p className="max-w-sm text-xs text-[var(--accent)]">{uploadError}</p>
-        )}
       </div>
 
       {lightbox}

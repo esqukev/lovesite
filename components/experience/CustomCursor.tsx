@@ -73,7 +73,11 @@ export function CustomCursor({ active }: { active: boolean }) {
   if (!active) return null;
 
   return (
-    <div ref={heartRef} className="cursor-heart" aria-hidden>
+    <div
+      ref={heartRef}
+      className="cursor-heart hidden opacity-0 [@media(pointer:fine)]:block"
+      aria-hidden
+    >
       <HeartCursorSvg />
     </div>
   );
