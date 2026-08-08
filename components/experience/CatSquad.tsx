@@ -94,10 +94,26 @@ type CatInstance = {
   tint: "accent" | "gold";
 };
 
+function shuffleLines(excludeLast?: string) {
+  const pool = [...CAT_LINES];
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  // Evita que el primer mensaje del nuevo ciclo sea el último del anterior
+  if (excludeLast && pool.length > 1 && pool[0] === excludeLast) {
+    const swapWith = 1 + Math.floor(Math.random() * (pool.length - 1));
+    [pool[0], pool[swapWith]] = [pool[swapWith], pool[0]];
+  }
+  return pool;
+}
+
 export function CatSquad({ active }: { active: boolean }) {
   const { discoverEgg, lightboxOpen } = useExperience();
   const catRef = useRef<HTMLButtonElement>(null);
   const bubbleRef = useRef<HTMLDivElement>(null);
+  const lineQueue = useRef<string[]>([]);
+  const lastLine = useRef<string | null>(null);
   const [mounted, setMounted] = useState(false);
   const [cat, setCat] = useState<CatInstance | null>(null);
   const [bubble, setBubble] = useState<Bubble | null>(null);
@@ -192,6 +208,15 @@ export function CatSquad({ active }: { active: boolean }) {
       document.removeEventListener("pointerdown", onPointerDown, true);
   }, [bubble, closePopupAndCat]);
 
+  const nextLine = () => {
+    if (!lineQueue.current.length) {
+      lineQueue.current = shuffleLines(lastLine.current ?? undefined);
+    }
+    const text = lineQueue.current.shift() ?? CAT_LINES[0];
+    lastLine.current = text;
+    return text;
+  };
+
   const meow = (e: MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
@@ -210,7 +235,7 @@ export function CatSquad({ active }: { active: boolean }) {
     ignoreOutsideUntil.current = performance.now() + 350;
 
     setBubble({
-      text: CAT_LINES[Math.floor(Math.random() * CAT_LINES.length)],
+      text: nextLine(),
       ...pos,
       side: spot.side,
     });
