@@ -21,7 +21,16 @@ const letter = Caveat({
   weight: ["400", "500", "600", "700"],
 });
 
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : "http://localhost:3000");
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: "Nuestro pequeño universo",
   description:
     "Un lugar al que solamente dos personas tienen acceso. Hecho para Motzy.",
@@ -33,6 +42,14 @@ export const metadata: Metadata = {
     description:
       "Existe un pequeño lugar al que solamente dos personas tienen acceso.",
     type: "website",
+    locale: "es_CR",
+    siteName: "Nuestro pequeño universo",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Nuestro pequeño universo",
+    description:
+      "Existe un pequeño lugar al que solamente dos personas tienen acceso.",
   },
 };
 
