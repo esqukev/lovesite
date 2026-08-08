@@ -45,6 +45,8 @@ export function AmbientEffects({ active }: { active: boolean }) {
     return () => window.removeEventListener("mousemove", onMove);
   }, [active, discoverEgg]);
 
+  if (!active) return null;
+
   return (
     <div ref={layerRef} className="pointer-events-none fixed inset-0 z-[60]" />
   );
