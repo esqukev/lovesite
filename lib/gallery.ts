@@ -2,12 +2,20 @@ import { GATE_KEY_STORAGE, GATE_PASSWORDS } from "@/lib/data";
 
 export { GATE_KEY_STORAGE };
 export const GALLERY_PREFIX = "gallery/";
+export const GALLERY_HIDDEN_PATH = "shared/gallery-hidden.json";
 
 export type GalleryPhoto = {
   src: string;
   alt: string;
   uploadedAt?: string;
   remote?: boolean;
+  pathname?: string;
+};
+
+export type GalleryHiddenPayload = {
+  version: 1;
+  updatedAt: string;
+  hidden: string[];
 };
 
 export function isValidGateKey(password: string | null | undefined) {

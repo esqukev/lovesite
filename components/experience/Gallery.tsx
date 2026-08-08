@@ -8,7 +8,7 @@ import { gsap } from "gsap";
 import { Draggable } from "gsap/Draggable";
 import { InertiaPlugin } from "gsap/InertiaPlugin";
 import { upload } from "@vercel/blob/client";
-import { ImagePlus, Loader2, X } from "lucide-react";
+import { ImagePlus, Loader2, Trash2, X } from "lucide-react";
 import { GALLERY_IMAGES } from "@/lib/data";
 import { getStoredGateKey, type GalleryPhoto } from "@/lib/gallery";
 import { useExperience } from "./ExperienceProvider";
@@ -40,16 +40,18 @@ export function Gallery() {
   const [origin, setOrigin] = useState<Origin | null>(null);
   const [mounted, setMounted] = useState(false);
   const [remote, setRemote] = useState<GalleryPhoto[]>([]);
+  const [hidden, setHidden] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [uploadError, setUploadError] = useState("");
   const [configured, setConfigured] = useState<boolean | null>(null);
   const { discoverEgg, setLightboxOpen, pushToast } = useExperience();
   const dragMoved = useRef(false);
 
-  const photos = useMemo(
-    () => [...remote, ...BASE_PHOTOS],
-    [remote],
-  );
+  const photos = useMemo(() => {
+    const base = BASE_PHOTOS.filter((p) => !hidden.includes(p.src));
+    return [...remote, ...base];
+  }, [remote, hidden]);
   const spots = useMemo(() => buildSpots(photos.length), [photos.length]);
 
   const loadRemote = useCallback(async () => {
@@ -57,13 +59,16 @@ export function Gallery() {
       const res = await fetch("/api/gallery", { cache: "no-store" });
       const data = (await res.json()) as {
         photos?: GalleryPhoto[];
+        hidden?: string[];
         configured?: boolean;
       };
       setConfigured(Boolean(data.configured));
       setRemote(data.photos ?? []);
+      setHidden(Array.isArray(data.hidden) ? data.hidden : []);
     } catch {
       setConfigured(false);
       setRemote([]);
+      setHidden([]);
     }
   }, []);
 
@@ -161,6 +166,57 @@ export function Gallery() {
     setActive(index);
   };
 
+  const deleteActive = async () => {
+    if (active === null || deleting) return;
+    const photo = photos[active];
+    if (!photo) return;
+
+    const password = getStoredGateKey();
+    if (!password) {
+      pushToast("Entra de nuevo", "Necesitas tu contraseña para borrar");
+      return;
+    }
+
+    setDeleting(true);
+    try {
+      const res = await fetch("/api/gallery", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          password,
+          src: photo.src,
+          pathname: photo.pathname,
+          remote: Boolean(photo.remote),
+        }),
+      });
+      const data = (await res.json()) as {
+        error?: string;
+        hidden?: string[];
+      };
+      if (!res.ok) {
+        pushToast("No se pudo borrar", data.error || "Intenta de nuevo");
+        return;
+      }
+
+      close();
+      if (photo.remote) {
+        setRemote((prev) => prev.filter((p) => p.src !== photo.src));
+      } else if (Array.isArray(data.hidden)) {
+        setHidden(data.hidden);
+      } else {
+        setHidden((prev) =>
+          prev.includes(photo.src) ? prev : [...prev, photo.src],
+        );
+      }
+      pushToast("Foto eliminada", "Ya no está en la mesa");
+      void loadRemote();
+    } catch {
+      pushToast("No se pudo borrar", "Revisa la conexión e intenta de nuevo");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   const onPickFile = async (fileList: FileList | null) => {
     const file = fileList?.[0];
     if (!file) return;
@@ -216,24 +272,51 @@ export function Gallery() {
             if (e.target === e.currentTarget) close();
           }}
         >
-          <button
-            type="button"
-            className="fixed right-5 top-5 z-[100001] flex h-12 w-12 items-center justify-center rounded-full bg-black/60 text-white shadow-lg"
-            style={{ pointerEvents: "auto" }}
-            onPointerDown={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              close();
-            }}
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              close();
-            }}
-            aria-label="Cerrar"
-          >
-            <X size={22} />
-          </button>
+          <div className="fixed right-4 top-4 z-[100001] flex items-center gap-2 sm:right-5 sm:top-5">
+            <button
+              type="button"
+              disabled={deleting}
+              className="flex h-12 items-center gap-2 rounded-full bg-black/60 px-4 text-sm text-white shadow-lg transition hover:bg-[var(--accent)] disabled:opacity-50"
+              style={{ pointerEvents: "auto", touchAction: "manipulation" }}
+              onPointerDown={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                void deleteActive();
+              }}
+              aria-label="Eliminar foto"
+            >
+              {deleting ? (
+                <Loader2 size={18} className="animate-spin" />
+              ) : (
+                <Trash2 size={18} />
+              )}
+              <span className="hidden sm:inline">
+                {deleting ? "Eliminando…" : "Eliminar"}
+              </span>
+            </button>
+            <button
+              type="button"
+              className="flex h-12 w-12 items-center justify-center rounded-full bg-black/60 text-white shadow-lg"
+              style={{ pointerEvents: "auto", touchAction: "manipulation" }}
+              onPointerDown={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                close();
+              }}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                close();
+              }}
+              aria-label="Cerrar"
+            >
+              <X size={22} />
+            </button>
+          </div>
 
           <motion.div
             className="relative h-[78vh] w-full max-w-4xl"
