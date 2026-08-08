@@ -57,6 +57,10 @@ export function Invitation({ active }: { active: boolean }) {
       colors: ["#e8b4b8", "#f3ebe3", "#ffffff", "#c4a574"],
       scalar: 0.85,
     });
+  };
+
+  const afterFrost = () => {
+    setShowFrost(false);
     window.open("https://wa.link/o7fbh3", "_blank", "noopener,noreferrer");
   };
 
@@ -139,7 +143,7 @@ export function Invitation({ active }: { active: boolean }) {
         <FrostHeart
           message="El tiempo contigo nunca es perdido."
           submessage="Siempre será recordado y guardado en el alma."
-          onDone={() => setShowFrost(false)}
+          onDone={afterFrost}
         />
       )}
     </>

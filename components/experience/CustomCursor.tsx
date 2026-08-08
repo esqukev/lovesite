@@ -27,8 +27,12 @@ export function CustomCursor({ active }: { active: boolean }) {
       const target = e.target as HTMLElement | null;
       const interactive = target?.closest("a, button, input, [data-cursor='hover']");
       gsap.to(ring, {
-        scale: interactive ? 1.8 : 1,
-        opacity: interactive ? 0.35 : 0.55,
+        scale: interactive ? 1.7 : 1,
+        opacity: interactive ? 1 : 0.95,
+        duration: 0.25,
+      });
+      gsap.to(dot, {
+        scale: interactive ? 0.55 : 1,
         duration: 0.25,
       });
     };

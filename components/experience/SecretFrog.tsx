@@ -71,7 +71,7 @@ export function SecretFrog({ active }: { active: boolean }) {
   };
 
   return (
-    <div className="fixed bottom-6 left-4 z-[45] sm:bottom-8 sm:left-6">
+    <div className="fixed bottom-6 right-4 z-[45] flex flex-col items-end sm:bottom-8 sm:right-6">
       <AnimatePresence>
         {hint && (
           <motion.div
