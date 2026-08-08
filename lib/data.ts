@@ -18,13 +18,10 @@ export const DATE_INVITE = {
 } as const;
 
 /**
- * Número de Motzy en WhatsApp (código país + número, sin + ni espacios).
- * Ejemplo Costa Rica: 50688887777
- *
- * Al aceptar la cita en la PC, se abre WhatsApp Desktop/Web hacia ESTE número
- * con el link del calendario listo para enviar → le llega al iPhone.
+ * Destino del WhatsApp al confirmar la cita (código país + número, sin +).
+ * Ahora: número de Kevin para pruebas. Luego cambiar a Motzy: 50663060175
  */
-export const MOTZY_WHATSAPP_NUMBER = "50663060175";
+export const MOTZY_WHATSAPP_NUMBER = "50661371097";
 
 /**
  * URL pública del sitio (para que el link del .ics funcione en su celular).

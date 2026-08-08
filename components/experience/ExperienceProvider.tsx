@@ -84,6 +84,17 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
     } catch {
       /* private mode */
     }
+
+    // Entrar como kevin reactiva la invitación para poder probar de nuevo con motzy
+    if (role === "owner") {
+      setInviteAccepted(false);
+      setInviteOpen(false);
+      try {
+        localStorage.removeItem(INVITE_ACCEPTED_KEY);
+      } catch {
+        /* private mode */
+      }
+    }
   }, []);
 
   const acceptInvite = useCallback(() => {

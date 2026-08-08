@@ -52,7 +52,8 @@ export function Invitation({ active }: { active: boolean }) {
   }, [active, canInvite, setInviteOpen]);
 
   const accept = () => {
-    acceptInvite();
+    // Cierra el popup pero aún no persiste: se guarda al enviar WhatsApp
+    setInviteOpen(false);
     setShowFrost(true);
     confetti({
       particleCount: 90,
@@ -68,9 +69,11 @@ export function Invitation({ active }: { active: boolean }) {
     setShowSend(true);
   };
 
-  /** Opens WhatsApp Desktop/Web → her chat, message ready to send to her phone */
+  /** WhatsApp con el mensaje listo; ahí sí queda aceptada de forma permanente */
   const sendToPhone = () => {
+    acceptInvite();
     window.open(getDateWhatsAppUrl(), "_blank", "noopener,noreferrer");
+    setShowSend(false);
   };
 
   const dodge = () => {
