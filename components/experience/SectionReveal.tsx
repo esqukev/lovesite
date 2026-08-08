@@ -23,23 +23,53 @@ export function SectionReveal({
     () => {
       const root = rootRef.current;
       if (!root) return;
-      const items = root.querySelectorAll<HTMLElement>("[data-reveal]");
+      const items = gsap.utils.toArray<HTMLElement>("[data-reveal]", root);
       if (!items.length) return;
 
-      gsap.from(items, {
-        y: 40,
+      let played = false;
+      gsap.set(items, {
+        y: 36,
         opacity: 0,
-        filter: "blur(6px)",
-        duration: 0.9,
-        stagger: 0.11,
-        delay,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: root,
-          start: "top 80%",
-          once: true,
-        },
+        filter: "blur(5px)",
       });
+
+      const play = () => {
+        if (played) return;
+        played = true;
+        gsap.to(items, {
+          y: 0,
+          opacity: 1,
+          filter: "blur(0px)",
+          duration: 0.85,
+          stagger: 0.12,
+          delay,
+          ease: "power3.out",
+          overwrite: true,
+        });
+      };
+
+      ScrollTrigger.create({
+        trigger: root,
+        start: "top 88%",
+        once: true,
+        onEnter: play,
+      });
+
+      // Catch sections already on screen after layout / pin refresh
+      const check = () => {
+        const top = root.getBoundingClientRect().top;
+        if (top < window.innerHeight * 0.9) play();
+      };
+      requestAnimationFrame(() => {
+        ScrollTrigger.refresh();
+        check();
+      });
+      const t = window.setTimeout(() => {
+        ScrollTrigger.refresh();
+        check();
+      }, 700);
+
+      return () => window.clearTimeout(t);
     },
     { scope: rootRef },
   );

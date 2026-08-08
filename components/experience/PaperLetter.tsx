@@ -17,14 +17,13 @@ export function PaperLetter({ onStart }: { onStart: () => void }) {
 
   useEffect(() => {
     gsap.from(".paper-shell", {
-      y: 50,
+      y: 36,
       opacity: 0,
-      duration: 1.1,
+      duration: 0.75,
       ease: "power3.out",
     });
   }, []);
 
-  // Subtle heart rain while the letter screen is up
   useEffect(() => {
     const root = rainRef.current;
     if (!root) return;
@@ -70,14 +69,15 @@ export function PaperLetter({ onStart }: { onStart: () => void }) {
   useEffect(() => {
     if (!open) return;
     let i = 0;
+    const step = window.matchMedia("(pointer: coarse)").matches ? 3 : 1;
     const id = window.setInterval(() => {
-      i += 1;
+      i = Math.min(WELCOME_LETTER.length, i + step);
       setDisplayed(WELCOME_LETTER.slice(0, i));
       if (i >= WELCOME_LETTER.length) {
         window.clearInterval(id);
         setDone(true);
       }
-    }, 18);
+    }, 16);
     return () => window.clearInterval(id);
   }, [open]);
 
@@ -85,42 +85,42 @@ export function PaperLetter({ onStart }: { onStart: () => void }) {
     if (openedRef.current) return;
     openedRef.current = true;
     setOpen(true);
-    // Animate after paint so the sheet is mounted
-    requestAnimationFrame(() => {
+  };
+
+  useEffect(() => {
+    if (!open) return;
+    const sheet = rootRef.current?.querySelector(".paper-sheet");
+    const flap = rootRef.current?.querySelector(".envelope-flap");
+    if (flap) {
       gsap.fromTo(
-        ".envelope-flap",
+        flap,
         { rotateX: 0 },
         {
           rotateX: 180,
-          duration: 0.7,
+          duration: 0.45,
           ease: "power2.inOut",
           transformOrigin: "top center",
         },
       );
+    }
+    if (sheet) {
       gsap.fromTo(
-        ".paper-sheet",
-        { y: 24, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.8,
-          delay: 0.2,
-          ease: "power3.out",
-        },
+        sheet,
+        { y: 16, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.4, ease: "power3.out" },
       );
-    });
-  };
+    }
+  }, [open]);
 
   const start = () => {
     if (!done || startedRef.current) return;
     startedRef.current = true;
+    // Enter immediately — short fade so mobile doesn't feel laggy
+    onStart();
     gsap.to(rootRef.current, {
       opacity: 0,
-      scale: 1.04,
-      filter: "blur(8px)",
-      duration: 0.85,
-      ease: "power2.inOut",
-      onComplete: onStart,
+      duration: 0.35,
+      ease: "power2.out",
     });
   };
 
@@ -146,10 +146,6 @@ export function PaperLetter({ onStart }: { onStart: () => void }) {
             <button
               type="button"
               onClick={openLetter}
-              onPointerUp={(e) => {
-                // iOS sometimes misses click on transformed stacks
-                if (e.pointerType === "touch") openLetter();
-              }}
               className="group relative mx-auto block w-full max-w-md touch-manipulation [-webkit-tap-highlight-color:transparent]"
               aria-label="Abrir carta"
             >
@@ -171,7 +167,6 @@ export function PaperLetter({ onStart }: { onStart: () => void }) {
                 >
                   ♥
                 </div>
-                {/* Full-size hit target above 3D flap (iOS hit-testing) */}
                 <span className="absolute inset-0 z-10" aria-hidden />
               </div>
               <p className="mt-4 text-center text-sm text-[var(--ink)]/50">
@@ -192,7 +187,7 @@ export function PaperLetter({ onStart }: { onStart: () => void }) {
                 </p>
 
                 <div
-                  className={`relative z-20 mt-8 flex justify-center transition-all duration-700 sm:mt-9 ${
+                  className={`relative z-20 mt-8 flex justify-center transition-all duration-500 sm:mt-9 ${
                     done
                       ? "translate-y-0 opacity-100"
                       : "pointer-events-none translate-y-3 opacity-0"
@@ -202,9 +197,6 @@ export function PaperLetter({ onStart }: { onStart: () => void }) {
                     type="button"
                     disabled={!done}
                     onClick={start}
-                    onPointerUp={(e) => {
-                      if (e.pointerType === "touch" && done) start();
-                    }}
                     className="letter-seal-btn group relative z-20 min-h-12 min-w-[10rem] touch-manipulation [-webkit-tap-highlight-color:transparent]"
                   >
                     <span className="letter-seal-glow pointer-events-none" aria-hidden />

@@ -166,11 +166,11 @@ export function StackedMemories() {
 
         <MiniCritter
           kind="frog"
-          className="absolute right-[22%] top-[28%] h-10 w-10 text-[#7a9e6a] opacity-80 lg:right-[28%]"
+          className="absolute right-[22%] top-[28%] hidden h-10 w-10 text-[#7a9e6a] opacity-80 sm:block lg:right-[28%]"
         />
         <MiniCritter
           kind="cat"
-          className="absolute right-[14%] top-[55%] h-11 w-11 text-[var(--accent)] opacity-80"
+          className="absolute right-[14%] top-[55%] hidden h-11 w-11 text-[var(--accent)] opacity-80 sm:block"
         />
         <MiniCritter
           kind="dog"
@@ -178,7 +178,7 @@ export function StackedMemories() {
         />
         <MiniCritter
           kind="frog"
-          className="absolute bottom-[28%] left-[12%] h-9 w-9 text-[#7a9e6a] opacity-70"
+          className="absolute bottom-[28%] left-[12%] hidden h-9 w-9 text-[#7a9e6a] opacity-70 sm:block"
         />
       </div>
 

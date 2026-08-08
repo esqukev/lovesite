@@ -116,6 +116,12 @@ export function Reasons() {
       />
       <div className="relative z-10 mx-auto max-w-3xl text-center">
         <SectionReveal>
+          <p
+            data-reveal
+            className="mb-3 text-xs uppercase tracking-[0.35em] text-[var(--gold)]"
+          >
+            Razones
+          </p>
           <h2
             data-reveal
             data-cinema="title"
