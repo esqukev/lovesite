@@ -24,7 +24,7 @@ export const DATE_INVITE = {
  * Al aceptar la cita en la PC, se abre WhatsApp Desktop/Web hacia ESTE número
  * con el link del calendario listo para enviar → le llega al iPhone.
  */
-export const MOTZY_WHATSAPP_NUMBER = "";
+export const MOTZY_WHATSAPP_NUMBER = "50663060175";
 
 /**
  * URL pública del sitio (para que el link del .ics funcione en su celular).
@@ -51,7 +51,7 @@ export function getDateWhatsAppUrl(origin?: string) {
   const text = [
     "Confirmé nuestra cita del domingo 16 ❤️",
     "",
-    "Toca este link en el iPhone para guardarla en tu Calendario:",
+    "Abre tu celular y confirma este link:",
     calendarUrl,
   ].join("\n");
 

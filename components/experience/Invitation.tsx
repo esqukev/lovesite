@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import confetti from "canvas-confetti";
 import { Button } from "@/components/ui/button";
-import { getDateWhatsAppUrl, MOTZY_WHATSAPP_NUMBER } from "@/lib/data";
+import { getDateWhatsAppUrl } from "@/lib/data";
 import { useExperience } from "./ExperienceProvider";
 import { FrostHeart } from "./FrostHeart";
 
@@ -85,8 +85,6 @@ export function Invitation({ active }: { active: boolean }) {
   };
 
   if (!canInvite && !showFrost && !inviteOpen && !showSend) return null;
-
-  const hasPhone = Boolean(MOTZY_WHATSAPP_NUMBER.replace(/\D/g, ""));
 
   return (
     <>
@@ -188,12 +186,6 @@ export function Invitation({ active }: { active: boolean }) {
               <Button size="lg" className="mt-8 w-full sm:w-auto" onClick={sendToPhone}>
                 Abrir WhatsApp
               </Button>
-
-              {!hasPhone && (
-                <p className="mt-4 text-xs text-amber-200/80">
-                  Tip: elige el chat de Motzy al abrir WhatsApp.
-                </p>
-              )}
 
               <button
                 type="button"
