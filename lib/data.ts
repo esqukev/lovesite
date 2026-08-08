@@ -17,11 +17,11 @@ export const DATE_INVITE = {
   icsPath: "/cita.ics",
 } as const;
 
-/**
- * Destino del WhatsApp al confirmar la cita (código país + número, sin +).
- * Ahora: número de Kevin para pruebas. Luego cambiar a Motzy: 50663060175
- */
-export const MOTZY_WHATSAPP_NUMBER = "50661371097";
+/** Motzy — destino real cuando entra con contraseña motzy */
+export const MOTZY_WHATSAPP_NUMBER = "50663060175";
+
+/** Kevin — para probar la invitación con contraseña kevin */
+export const KEVIN_WHATSAPP_NUMBER = "50661371097";
 
 /**
  * URL pública del sitio (para que el link del .ics funcione en su celular).
@@ -39,11 +39,20 @@ export function getDateCalendarUrl(origin?: string) {
   return `${base}${DATE_INVITE.icsPath}`;
 }
 
+function whatsappNumberForRole(role?: VisitorRole | null) {
+  // kevin = pruebas a tu número; motzy/guest = número de ella
+  if (role === "owner") return KEVIN_WHATSAPP_NUMBER;
+  return MOTZY_WHATSAPP_NUMBER;
+}
+
 /**
- * WhatsApp → chat con ella, mensaje listo con el link de Apple Calendar.
- * En la PC solo hay que pulsar Enviar; a ella le llega al teléfono.
+ * WhatsApp con el link de Apple Calendar.
+ * motzy → su número · kevin → tu número (pruebas)
  */
-export function getDateWhatsAppUrl(origin?: string) {
+export function getDateWhatsAppUrl(
+  origin?: string,
+  role?: VisitorRole | null,
+) {
   const calendarUrl = getDateCalendarUrl(origin);
   const text = [
     "Confirmé nuestra cita del domingo 16 ❤️",
@@ -53,11 +62,7 @@ export function getDateWhatsAppUrl(origin?: string) {
   ].join("\n");
 
   const encoded = encodeURIComponent(text);
-  const phone = MOTZY_WHATSAPP_NUMBER.replace(/\D/g, "");
-  if (!phone) {
-    // Sin número aún: abre WhatsApp para elegir el chat a mano
-    return `https://api.whatsapp.com/send?text=${encoded}`;
-  }
+  const phone = whatsappNumberForRole(role).replace(/\D/g, "");
   return `https://wa.me/${phone}?text=${encoded}`;
 }
 

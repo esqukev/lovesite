@@ -81,7 +81,11 @@ export function Invitation({ active }: { active: boolean }) {
   /** WhatsApp con el mensaje listo; ahí sí queda aceptada de forma permanente */
   const sendToPhone = () => {
     acceptInvite();
-    window.open(getDateWhatsAppUrl(), "_blank", "noopener,noreferrer");
+    window.open(
+      getDateWhatsAppUrl(undefined, visitorRole),
+      "_blank",
+      "noopener,noreferrer",
+    );
     setShowSend(false);
   };
 
